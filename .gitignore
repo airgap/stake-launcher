@@ -94,3 +94,6 @@ out/
 .idea
 .vscode
 dist
+
+settings.json
+cookies.json
