@@ -1,6 +1,6 @@
 {
-  "name": "golden-stake",
-  "productName": "golden-stake",
+  "name": "stake-launcher",
+  "productName": "stake-launcher",
   "version": "0.0.0",
   "description": "My Electron application description",
   "main": ".webpack/main",

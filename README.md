@@ -1,12 +1,12 @@
-# Golden Stake
+# Stake Launcher
 
 Desktop client for StakingFarm that supports automatic dividend staking and SMS notifications
 
 ## Usage
 
 ```shell
-git clone https://github.com/airgap/golden-stake.git
-cd golden-stake
+git clone https://github.com/airgap/stake-launcher.git
+cd stake-launcher
 npm i
 npm run start
 ```
