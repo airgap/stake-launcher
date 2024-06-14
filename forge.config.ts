@@ -19,19 +19,19 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      name: "electron-app",
-      authors: "Your Name",
-      exe: "electron-app.exe",
-      setupExe: "ElectronAppSetup.exe",
-      setupIcon: "./src/assets/icon.ico",
+      name: "Stake Launcher",
+      authors: "airgap",
+      exe: "stake-launcher.exe",
+      setupExe: "StakeLauncherSetup.exe",
+      // setupIcon: "./src/assets/icon.ico",
     }),
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
     new MakerDeb({}),
     new MakerWix({
       language: 1033,
-      manufacturer: "My Awesome Company",
-      exe: "electron-app.exe",
+      manufacturer: "airgap",
+      exe: "stake-launcher.exe",
       // setupExe: 'ElectronAppSetup.exe',
       // setupIcon: './src/assets/icon.ico'
     }),

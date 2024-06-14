@@ -14,8 +14,12 @@ npm run start
 ## Roadmap
 
 - [ ] SMS notifications
+    - Limited rollout
 - [ ] Email notifications
 - [ ] CLI mode
+- [ ] Linux x64 installer (.deb, .rpm)
+- [ ] Mac installer ()
+- [ ] Windows executable / installer
 - [ ] Windows executable / installer
 - [ ] Auto stake dividends with threshold
 - [ ] Auto stake diversification
@@ -26,6 +30,3 @@ npm run start
 - [ ] Wall projector mode
 - [ ] Widget mode
 
-### Support development
-
-Eth: 0x2Af16B0669216D724C6EE6a5d66675Eb18C1820c

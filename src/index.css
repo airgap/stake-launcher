@@ -1,11 +1,5 @@
 html {
-  background-color: #ff3cac;
-  background-image: linear-gradient(
-    225deg,
-    #86215c 0%,
-    #58396e 50%,
-    #154564 100%
-  );
+  background-image: radial-gradient( circle 975px at 2.6% 48.3%,  rgba(0,8,120,1) 0%, rgba(95,184,224,1) 99.7% );
   height: 100%;
   font-size: 1.2em;
 }
@@ -26,11 +20,15 @@ h6 {
   font-weight: 100;
 }
 
+h3:first-child {
+  margin-top: 0;
+}
+
 .button,
 input {
   transition: 0.125s all;
-  background: #00000033;
-  border: 2px solid #00000055;
+  background: #ffffff33;
+  border: 2px solid #ffffff55;
 }
 
 .button {
@@ -43,16 +41,63 @@ input {
 }
 .button:hover,
 input:hover {
-  border-color: #00000077;
-  background: #00000055;
+  border-color: #ffffff77;
+  background: #ffffff55;
+}
+.link {
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  border: none;
+  position: relative;
+  display: inline-block;
+  margin: 5px;
+  cursor: pointer;
+  transition: .125s;
+  /* border-bottom: 1px solid white; */
+}
+.link::after {
+  width: calc(100% - 10px);
+  display: block;
+  height: 2px;
+  background: #ffffff77;
+  content: ' ';
+  transition: .125s;
+  bottom: -2px;
+  position: absolute;
+  left: 5px;
+  z-index: -1;
+}
+.link:hover::after {
+  left: 0px;
+  width: 100%;
+  height: calc(100% + 4px);
+  opacity: .2;
 }
 input {
   font-size: inherit;
-  background: #00000033;
+  background: #ffffff33;
   color: inherit;
 }
 
 footer {
   position: absolute;
   bottom: 0;
+  text-align: center;
+  left: 0;
+  right: 0;
+  padding: 5px
+}
+
+.currencyInput {
+  position: relative;
+}
+.currencyInput input {
+  padding-left: 14px;
+}
+.currencyInput::before {
+  content: '$';
+  position: absolute;
+  bottom: 3px;
+  left: 4px;
 }
