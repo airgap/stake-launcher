@@ -14,7 +14,7 @@ npm run start
 ## Roadmap
 
 - [ ] SMS notifications
-    - Limited rollout
+  - Limited rollout
 - [ ] Email notifications
 - [ ] CLI mode
 - [ ] Linux x64 installer (.deb, .rpm)
@@ -29,4 +29,3 @@ npm run start
 - [ ] Gamified interface
 - [ ] Wall projector mode
 - [ ] Widget mode
-

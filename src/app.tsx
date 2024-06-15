@@ -1,4 +1,4 @@
 import { createRoot } from "react-dom/client";
-import { GoldenStake } from "./GoldenStake";
+import { StakeLauncher } from "./StakeLauncher";
 const root = createRoot(document.getElementById("root"));
-root.render(<GoldenStake />);
+root.render(<StakeLauncher />);

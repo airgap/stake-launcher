@@ -4,7 +4,7 @@ import { setSettings, useSettings } from "./reactSettingsStore";
 import "react-responsive-modal/styles.css";
 import { Modal, ModalProps } from "react-responsive-modal";
 export const sendSms = (balance: number) => false;
-export const GoldenStake = () => {
+export const StakeLauncher = () => {
   const settings = useSettings();
   const balance = useBalance();
   const [lastAlert, setLastAlert] = useState(0);
@@ -23,7 +23,7 @@ export const GoldenStake = () => {
   );
   const [farmCredModal, setFarmCredModal] = useState(false);
   const [apiKeyModal, setApiKeyModal] = useState(false);
-  const modalStyles: ModalProps['styles'] = {
+  const modalStyles: ModalProps["styles"] = {
     modal: {
       backgroundColor: "#000000AA",
       backdropFilter: "blur(10px)",
@@ -40,24 +40,35 @@ export const GoldenStake = () => {
   return (
     <div>
       <center>
-        <h2>Balance: {balance ? `$${balance.toFixed(2)}` : <button className="link">Check</button>}</h2>
+        <h2>
+          Balance:{" "}
+          {balance ? (
+            `$${balance.toFixed(2)}`
+          ) : (
+            <button className="link">Check</button>
+          )}
+        </h2>
       </center>
       <table>
         <tbody>
-          {settings?.apiKey && <tr>
-            <td>
-              <input
-                type="checkbox"
-                onChange={(e) => setSms(e.target.checked)}
-              />
-            </td>
-            <td>Enable SMS</td>
-          </tr>}
+          {settings?.apiKey && (
+            <tr>
+              <td>
+                <input
+                  type="checkbox"
+                  onChange={(e) => setSms(e.target.checked)}
+                />
+              </td>
+              <td>Enable SMS</td>
+            </tr>
+          )}
           <tr>
             <td></td>
             <td>SMS threshold</td>
             <td>
-              <div  className="currencyInput"><input type="number" min={0} value={notifyThreshold} /></div>
+              <div className="currencyInput">
+                <input type="number" min={0} value={notifyThreshold} />
+              </div>
             </td>
           </tr>
         </tbody>
@@ -65,7 +76,9 @@ export const GoldenStake = () => {
       <button className="link" onClick={() => setFarmCredModal(true)}>
         Preload login
       </button>
-      <button className="link" onClick={() => setApiKeyModal(true)}>Set API key</button>
+      <button className="link" onClick={() => setApiKeyModal(true)}>
+        Set API key
+      </button>
       <Modal
         open={farmCredModal}
         onClose={() => setFarmCredModal(false)}
@@ -83,8 +96,12 @@ export const GoldenStake = () => {
           value={farmPassword}
           onChange={(e) => setFarmPassword(e.target.value)}
         />
-        <p>Careful with this! Please don't put your main wallet here. This is just for development.</p>
-        <button className="link"
+        <p>
+          Careful with this! Please don't put your main wallet here. This is
+          just for development.
+        </p>
+        <button
+          className="link"
           onClick={() => {
             const newSettings = {
               ...settings,
@@ -98,41 +115,49 @@ export const GoldenStake = () => {
         >
           Save
         </button>
-        <button className="link"
+        <button
+          className="link"
           onClick={() => {
-            setFarmEmail(farmEmail||undefined);
-            setFarmPassword(farmPassword||undefined);
+            setFarmEmail(farmEmail || undefined);
+            setFarmPassword(farmPassword || undefined);
             setFarmCredModal(false);
           }}
         >
           Cancel
         </button>
       </Modal>
-      <Modal open={apiKeyModal} onClose={() => setApiKeyModal(false)} styles={modalStyles}>
+      <Modal
+        open={apiKeyModal}
+        onClose={() => setApiKeyModal(false)}
+        styles={modalStyles}
+      >
         <h3>API key</h3>
         <input
           type="password"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
         />
-        <br/><br/>
-        <button className="link"
+        <br />
+        <br />
+        <button
+          className="link"
           onClick={() => {
             const newSettings = {
               ...settings,
               apiKey: apiKey || undefined,
             };
-            setSettings(newSettings||undefined);
+            setSettings(newSettings || undefined);
             (window as any).electronAPI.settingsChanged(newSettings);
             setApiKeyModal(false);
           }}
         >
           Save
         </button>
-        <button className="link"
+        <button
+          className="link"
           onClick={() => {
-            setFarmEmail(farmEmail||undefined);
-            setFarmPassword(farmPassword||undefined);
+            setFarmEmail(farmEmail || undefined);
+            setFarmPassword(farmPassword || undefined);
           }}
         >
           Cancel

@@ -1,5 +1,9 @@
 html {
-  background-image: radial-gradient( circle 975px at 2.6% 48.3%,  rgba(0,8,120,1) 0%, rgba(95,184,224,1) 99.7% );
+  background-image: radial-gradient(
+    circle 975px at 2.6% 48.3%,
+    rgba(0, 8, 120, 1) 0%,
+    rgba(95, 184, 224, 1) 99.7%
+  );
   height: 100%;
   font-size: 1.2em;
 }
@@ -53,7 +57,7 @@ input:hover {
   display: inline-block;
   margin: 5px;
   cursor: pointer;
-  transition: .125s;
+  transition: 0.125s;
   /* border-bottom: 1px solid white; */
 }
 .link::after {
@@ -61,8 +65,8 @@ input:hover {
   display: block;
   height: 2px;
   background: #ffffff77;
-  content: ' ';
-  transition: .125s;
+  content: " ";
+  transition: 0.125s;
   bottom: -2px;
   position: absolute;
   left: 5px;
@@ -72,7 +76,7 @@ input:hover {
   left: 0px;
   width: 100%;
   height: calc(100% + 4px);
-  opacity: .2;
+  opacity: 0.2;
 }
 input {
   font-size: inherit;
@@ -86,7 +90,7 @@ footer {
   text-align: center;
   left: 0;
   right: 0;
-  padding: 5px
+  padding: 5px;
 }
 
 .currencyInput {
@@ -96,7 +100,7 @@ footer {
   padding-left: 14px;
 }
 .currencyInput::before {
-  content: '$';
+  content: "$";
   position: absolute;
   bottom: 3px;
   left: 4px;
