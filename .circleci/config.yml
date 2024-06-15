@@ -3,7 +3,7 @@ version: 2.1
 executors:
   windows:
     machine:
-      image: windows-server-2019-vs2019:current
+      image: windows-server-2022-gui:current
   macos:
     macos:
       xcode: "12.4.0"
