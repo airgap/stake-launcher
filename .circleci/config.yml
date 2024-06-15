@@ -3,7 +3,7 @@ version: 2.1
 executors:
   windows:
     machine:
-      docker: windows-server-2019:stable
+      image: windows-server-2019:stable
   macos:
     macos:
       xcode: "12.4.0"
