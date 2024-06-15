@@ -5,7 +5,8 @@ executors:
     machine:
       docker: windows-server-2019:stable
   macos:
-    xcode: "12.4.0"
+    macos:
+      xcode: "12.4.0"
   linux:
     docker:
       - image: circleci/node:latest
