@@ -21,6 +21,9 @@ jobs:
           name: Install Node.js
           command: choco install nodejs
       - run:
+          name: Install Windows build tools
+          command: npm install -g windows-build-tools
+      - run:
           name: Install npm packages
           command: npm ci
       - run:
