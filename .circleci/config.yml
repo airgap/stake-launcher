@@ -1,0 +1,95 @@
+version: 2.1
+
+executors:
+  windows:
+    machine:
+      image: windows-server-2019-vs2019:stable
+  macos:
+    macos:
+      xcode: "12.4.0"
+  linux:
+    docker:
+      - image: circleci/node:latest
+
+jobs:
+  build-windows:
+    executor: windows
+    steps:
+      - checkout
+      - run:
+          name: Install Node.js
+          command: choco install nodejs
+      - run:
+          name: Install npm packages
+          command: npm ci
+      - run:
+          name: Build Windows binary
+          command: npm run make
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist/
+
+  build-macos:
+    executor: macos
+    steps:
+      - checkout
+      - run:
+          name: Install npm packages
+          command: npm ci
+      - run:
+          name: Build macOS binary
+          command: npm run make
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist/
+
+  build-linux:
+    executor: linux
+    steps:
+      - checkout
+      - run:
+          name: Install npm packages
+          command: npm ci
+      - run:
+          name: Build Linux binary
+          command: npm run make
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist/
+
+  deploy:
+    docker:
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /workspace
+      - run:
+          name: Install GitHub CLI
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            sudo apt-key add /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install gh
+      - run:
+          name: Upload binaries to GitHub Release
+          command: |
+            gh auth login --with-token < $GITHUB_TOKEN
+            gh release create v1.0.0 /workspace/dist/* --title "Release v1.0.0" --notes "Automated release of binaries"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-windows
+      - build-macos
+      - build-linux
+      - deploy:
+          requires:
+            - build-windows
+            - build-macos
+            - build-linux
