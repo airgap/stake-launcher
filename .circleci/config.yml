@@ -3,10 +3,9 @@ version: 2.1
 executors:
   windows:
     machine:
-      image: windows-server-2019-vs2019:stable
+      docker: windows-server-2019:stable
   macos:
-    macos:
-      xcode: "12.4.0"
+    xcode: "12.4.0"
   linux:
     docker:
       - image: circleci/node:latest
@@ -14,6 +13,7 @@ executors:
 jobs:
   build-windows:
     executor: windows
+    resource_class: windows.medium
     steps:
       - checkout
       - run:
@@ -32,6 +32,7 @@ jobs:
 
   build-macos:
     executor: macos
+    resource_class: macos.m1.medium.gen1
     steps:
       - checkout
       - run:
@@ -61,8 +62,7 @@ jobs:
             - dist/
 
   deploy:
-    docker:
-      - image: circleci/node:latest
+    executor: linux
     steps:
       - checkout
       - attach_workspace:
