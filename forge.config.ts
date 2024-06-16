@@ -28,13 +28,13 @@ const config: ForgeConfig = {
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
     new MakerDeb({}),
-    new MakerWix({
-      language: 1033,
-      manufacturer: "airgap",
-      exe: "stake-launcher.exe",
-      // setupExe: 'ElectronAppSetup.exe',
-      // setupIcon: './src/assets/icon.ico'
-    }),
+    // new MakerWix({
+    //   language: 1033,
+    //   manufacturer: "airgap",
+    //   exe: "stake-launcher.exe",
+    //   // setupExe: 'ElectronAppSetup.exe',
+    //   // setupIcon: './src/assets/icon.ico'
+    // }),
   ],
   plugins: [
     new AutoUnpackNativesPlugin({}),
