@@ -86,8 +86,5 @@
       "perMachine": true,
       "allowToChangeInstallationDirectory": true
     }
-  },
-  "optionalDependencies": {
-    "windows-build-tools": "^5.2.2"
   }
 }
