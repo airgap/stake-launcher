@@ -19,7 +19,7 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      name: "Stake Launcher",
+      name: "StakeLauncher",
       authors: "airgap",
       exe: "stake-launcher.exe",
       setupExe: "StakeLauncherSetup.exe",
