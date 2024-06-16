@@ -51,10 +51,7 @@ jobs:
     executor: linux
     steps:
       - checkout
-      - run: |
-          wget http://deb.debian.org/debian/pool/main/liba/libarchive/libarchive13_3.4.3-2+b1_amd64.deb
-          sudo dpkg -i libarchive13_3.4.3-2+b1_amd64.deb
-      - run: sudo apt-get install rpm --fix-missing
+      - run: sudo apt-get install libarchive13 rpm --fix-missing
       - run:
           name: Install npm packages
           command: npm ci
