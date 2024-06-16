@@ -51,6 +51,7 @@ jobs:
     executor: linux
     steps:
       - checkout
+      - run: sudo apt-get install rpm
       - run:
           name: Install npm packages
           command: npm ci
