@@ -9,7 +9,7 @@ executors:
       xcode: "14.2.0"
   linux:
     docker:
-      - image: cimg/node:latest
+      - image: circleci/node:latest
 
 jobs:
   build-windows:
