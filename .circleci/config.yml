@@ -27,7 +27,7 @@ jobs:
           name: Build Windows binary
           command: npm run make
       - persist_to_workspace:
-          root: .
+          root: /workspace
           paths:
             - out/
 
@@ -43,7 +43,7 @@ jobs:
           name: Build macOS binary
           command: npm run make
       - persist_to_workspace:
-          root: .
+          root: /workspace
           paths:
             - out/
 
@@ -59,7 +59,7 @@ jobs:
           name: Build Linux binary
           command: npm run make
       - persist_to_workspace:
-          root: .
+          root: /workspace
           paths:
             - out/
 
