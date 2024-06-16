@@ -51,7 +51,7 @@ jobs:
     executor: linux
     steps:
       - checkout
-      - run: sudo apt-get install libarchive13 rpm --fix-missing
+      - run: sudo apt-get install libarchive13 rpm
       - run:
           name: Install npm packages
           command: npm ci
