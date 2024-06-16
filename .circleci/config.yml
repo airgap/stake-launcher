@@ -19,7 +19,7 @@ jobs:
       - checkout
       - run:
           name: Install Node.js
-          command: choco install -y nodejs
+          command: nvm install 20
       - run:
           name: Install npm packages
           command: npm ci
