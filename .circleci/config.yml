@@ -6,7 +6,7 @@ executors:
       image: windows-server-2022-gui:current
   macos:
     macos:
-      xcode: "12.4.0"
+      xcode: "15.4.0"
   linux:
     docker:
       - image: circleci/node:latest
@@ -51,7 +51,7 @@ jobs:
     executor: linux
     steps:
       - checkout
-      - run: sudo apt-get install rpm
+      - run: sudo apt-get install rpm --fix-missing
       - run:
           name: Install npm packages
           command: npm ci
