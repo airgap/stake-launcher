@@ -80,9 +80,15 @@ jobs:
       - run:
           name: Upload binaries to GitHub Release
           command: |
-            ls out
-            gh release create v0.0.0 out/make/deb/x64/* out/make/rpm/x64/* out/make/squirrel.windows/x64/StakeLauncher* out/make/zip/darwin/arm64/* --title "Release v1.0.0" --notes "Automated release of binaries"
-
+            CURRENT_VERSION=$(jq -r .version package.json)
+            LATEST_VERSION=$(gh release list --limit 1 | awk '{print $1}')
+            if [ "$(printf '%s\n' "$LATEST_VERSION" "$CURRENT_VERSION" | sort -V | head -n1)" = "$LATEST_VERSION" ] && [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+              echo "New version $CURRENT_VERSION is greater than $LATEST_VERSION"
+              ls out
+              gh release create "v$CURRENT_VERSION" out/make/deb/x64/* out/make/rpm/x64/* out/make/squirrel.windows/x64/StakeLauncher* out/make/zip/darwin/arm64/* --title "Release v$CURRENT_VERSION" --notes "Automated release of binaries"
+            else
+              echo "Current version $CURRENT_VERSION is not greater than $LATEST_VERSION. Skipping deployment."
+            fi
 workflows:
   version: 2
   build-and-deploy:
