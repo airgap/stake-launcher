@@ -81,7 +81,7 @@ jobs:
           name: Upload binaries to GitHub Release
           command: |
             ls out
-            gh auth login --with-token
+            gh auth login
             gh release create v0.0.0 out/* --title "Release v1.0.0" --notes "Automated release of binaries"
 
 workflows:
