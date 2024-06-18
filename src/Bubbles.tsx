@@ -21,11 +21,12 @@ export const Bubble = ({
   amount: number;
   onFinish: () => void;
 }) => {
+    const text = useMemo(() => amount < 1 ? Math.round(amount*100) + '¢' : '$' + Math.round(amount*10)/10,[amount])
   // const [x, setX] = useState(Math.random() * 90 + 5);
   const [y, setY] = useState(50);
   const ySpeed = useMemo(() => Math.random() / 4 + 0.1, []);
 
-  useRequestAnimationFrame((timestamp: number) => {
+  useRequestAnimationFrame(() => {
     // Animation code goes here
     setY((y) => y - ySpeed);
     console.log("y", y);
