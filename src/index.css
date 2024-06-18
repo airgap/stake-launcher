@@ -60,6 +60,10 @@ input:hover {
   transition: 0.125s;
   /* border-bottom: 1px solid white; */
 }
+.link:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
 .link::after {
   width: calc(100% - 10px);
   display: block;
@@ -104,4 +108,16 @@ footer {
   position: absolute;
   bottom: 3px;
   left: 4px;
+}
+.awsui-context-flashbar {
+  /*opacity: .5*/
+}
+[data-analytics-flashbar="error"] {
+  background-color: #ff52367f !important;
+  background-image: linear-gradient(
+    90deg,
+    #ff52367f 0%,
+    #ff2b5780 55%,
+    #ff52367f 100%
+  ) !important;
 }

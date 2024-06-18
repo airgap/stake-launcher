@@ -54,6 +54,8 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@cloudscape-design/components": "^3.0.662",
+    "@cloudscape-design/global-styles": "^1.0.27",
     "config": "^3.3.11",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^9.0.0",

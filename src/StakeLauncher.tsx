@@ -3,8 +3,41 @@ import { useBalance } from "./balanceStore";
 import { setSettings, useSettings } from "./reactSettingsStore";
 import "react-responsive-modal/styles.css";
 import { Modal, ModalProps } from "react-responsive-modal";
+import { Flashbar, FlashbarProps } from "@cloudscape-design/components";
+import MessageDefinition = FlashbarProps.MessageDefinition;
+import { Order, Plan } from "./preload";
+import { Bubbles } from "./Bubbles";
+const { electronAPI } = window as any;
+export const Unchecked = () => <i>unchecked</i>;
 export const sendSms = (balance: number) => false;
 export const StakeLauncher = () => {
+  const [notifications, setNotifications] = useState<MessageDefinition[]>([]);
+  const dismissNotification = (label: string) => {
+    const index = notifications.findIndex(
+      ({ dismissLabel }) => dismissLabel === label,
+    );
+    setNotifications([
+      ...notifications.slice(0, index),
+      ...notifications.splice(index),
+    ]);
+  };
+  useEffect(() => {
+    electronAPI.onError((error: Error) => {
+      const label = Math.random().toString().substring(2);
+      setNotifications([
+        ...notifications,
+        {
+          header: error.name,
+          type: "error",
+          content: error.message,
+          dismissible: true,
+          dismissLabel: label,
+          onDismiss: () => dismissNotification(label),
+        },
+      ]);
+      console.log("Got error", error);
+    });
+  }, []);
   const settings = useSettings();
   const balance = useBalance();
   const [lastAlert, setLastAlert] = useState(0);
@@ -21,8 +54,12 @@ export const StakeLauncher = () => {
   const [autobuyThreshold, setAutobuyThreshold] = useState(
     settings?.autobuyThreshold,
   );
+  const [plans, setPlans] = useState<Plan[]>();
+  const [orders, setOrders] = useState<Order[]>();
+  const [totalDaily, setTotalDaily] = useState<number>();
   const [farmCredModal, setFarmCredModal] = useState(false);
   const [apiKeyModal, setApiKeyModal] = useState(false);
+  const [querying, setQuerying] = useState(false);
   const modalStyles: ModalProps["styles"] = {
     modal: {
       backgroundColor: "#000000AA",
@@ -30,6 +67,17 @@ export const StakeLauncher = () => {
       borderRadius: "5px",
     },
   };
+  const checkBalance = async () => {
+    setQuerying(true);
+    await (window as any).electronAPI.getBalance();
+    setQuerying(false);
+  };
+  const Check = ({ onClick }: { onClick: () => void }) => (
+    <button className="link" disabled={querying} onClick={onClick}>
+      Check
+    </button>
+  );
+
   useEffect(() => {
     if (!(sms && notifyThreshold)) return;
     if (balance > notifyThreshold && balance > lastAlert) {
@@ -37,16 +85,48 @@ export const StakeLauncher = () => {
       sendSms(balance);
     }
   }, [sms, balance, lastAlert, notifyThreshold]);
+
+  useEffect(() => {
+    electronAPI.onPlansUpdate(setPlans);
+    electronAPI.onOrdersUpdate(setOrders);
+  }, []);
+  useEffect(() => {
+    console.log("orders", orders, "plans", plans);
+    if (!(orders?.length && plans?.length)) return;
+    const now = +new Date();
+    setTotalDaily(
+      orders
+        .filter((order) => order.nextPayment > now)
+        .map(
+          (order) => plans.find((plan) => plan.name === order.contract).daily,
+        )
+        .reduce((a, b) => a + b),
+    );
+  }, [orders, plans]);
+
+  // useEffect(() => {
+  //   electronAPI.getPlans();
+  // }, []);
   return (
     <div>
+      <Bubbles daily={totalDaily} />
+      <Flashbar items={notifications} />
       <center>
         <h2>
-          Balance:{" "}
-          {balance ? (
-            `$${balance.toFixed(2)}`
-          ) : (
-            <button className="link">Check</button>
-          )}
+          Balance: {balance ? `$${balance.toFixed(2)}` : <Unchecked />}
+          <Check onClick={checkBalance} />
+        </h2>
+        <h2>
+          Total daily:{" "}
+          {totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}
+          <Check
+            onClick={async () => {
+              setQuerying(true);
+              await electronAPI.getPlans();
+              await electronAPI.getOrders();
+              setQuerying(false);
+            }}
+          />
         </h2>
       </center>
       <table>
@@ -62,15 +142,17 @@ export const StakeLauncher = () => {
               <td>Enable SMS</td>
             </tr>
           )}
-          <tr>
-            <td></td>
-            <td>SMS threshold</td>
-            <td>
-              <div className="currencyInput">
-                <input type="number" min={0} value={notifyThreshold} />
-              </div>
-            </td>
-          </tr>
+          {apiKey && (
+            <tr>
+              <td></td>
+              <td>SMS threshold</td>
+              <td>
+                <div className="currencyInput">
+                  <input type="number" min={0} value={notifyThreshold} />
+                </div>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
       <button className="link" onClick={() => setFarmCredModal(true)}>
@@ -158,6 +240,7 @@ export const StakeLauncher = () => {
           onClick={() => {
             setFarmEmail(farmEmail || undefined);
             setFarmPassword(farmPassword || undefined);
+            setApiKeyModal(false);
           }}
         >
           Cancel
