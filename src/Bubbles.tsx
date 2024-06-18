@@ -41,7 +41,7 @@ export const Bubble = ({
         left: 50 + Math.sin(y / 25) * 25 + "vw",
         top: y + "vh",
         borderRadius: "50%",
-        backgroundColor: "#00000033",
+        backgroundColor: "#ffffff33",
       }}
     >
       {amount}
