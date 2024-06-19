@@ -1,8 +1,8 @@
 {
   "name": "stake-launcher",
   "productName": "stake-launcher",
-  "version": "0.0.1",
-  "description": "My Electron application description",
+  "version": "0.0.2",
+  "description": "Unofficial client for StakingFarm",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
