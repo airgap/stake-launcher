@@ -16,7 +16,7 @@ if (require("electron-squirrel-startup")) {
   app.quit();
 }
 let mainWindow: BrowserWindow;
-const createWindow = (): void => {
+const createWindow = async (): Promise<void> => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 500,
@@ -31,7 +31,8 @@ const createWindow = (): void => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  await mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  await loadSettings(mainWindow);
 
   // mainWindow.on("ready-to-show", launchPuppeteer);
 
@@ -64,7 +65,7 @@ app.on("activate", () => {
 const newPageWithUrl = async (url: string, headless?: boolean) => {
   await loadSettings(mainWindow);
   const browser = await puppeteer.launch({
-    headless: headless ?? serverSettingsStore.headless,
+    headless: headless ?? serverSettingsStore?.headless,
     devtools: false,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
@@ -117,7 +118,7 @@ const pageOrLogin = async (url: string) => {
   return page;
 };
 const signIn = async () => {
-  let page: Page;
+  let page: Page | undefined = undefined;
   let signedIn = false;
   let attempt = 0;
   while (!signedIn) {
@@ -138,6 +139,7 @@ const signIn = async () => {
     await page.waitForNavigation({ timeout: 0 });
     if (!isPageSignin(page)) signedIn = true;
   }
+  if (!page) return;
   cookies = await page.cookies();
   console.log("Signed in and cached cookies");
   await page.close();
@@ -149,8 +151,8 @@ const scanBalance = async () => {
     "body > div.dashboard-section > div.dashboard-part > div:nth-child(2) > div:nth-child(1) > div > div > div > div:nth-child(1) > h1.grd-text.mt-4.mb-0";
   await page.waitForSelector(balanceSelector);
   const balanceNode = await page.$(balanceSelector);
-  const balanceText = await page.evaluate((e) => e.innerText, balanceNode);
-  const balance = parseFloat(balanceText.substring(2));
+  const balanceText = await page.evaluate((e) => e?.innerText, balanceNode);
+  const balance = parseFloat(balanceText?.substring(2) ?? "0");
   mainWindow.webContents.send("balance-update", balance);
   await page.close();
 };
@@ -197,7 +199,7 @@ const scanPlans = async (): Promise<Plan[]> => {
       for (const { regex, array } of Object.values(map))
         if (regex.test(element.innerText)) {
           console.log("array", array);
-          array.push(parseFloat(element.innerText.match(regex)[1]));
+          array.push(parseFloat(element.innerText.match(regex)?.[1] ?? "0"));
         }
     });
     return Object.entries(map).reduce((acc, [key, { array }]) => {
@@ -225,8 +227,8 @@ ipcMain.handle("get-plans", () =>
 const scanOrders = async (): Promise<Order[]> => {
   const page = await pageOrLogin(urls.orders);
   const payments = await page.$$eval("#body_table script", (scripts) =>
-    scripts.map((script) =>
-      script.innerHTML.match(/'(\d+)', '(\d+)'/).slice(1),
+    scripts.map(
+      (script) => script.innerHTML.match(/'(\d+)', '(\d+)'/)?.slice(1) ?? [],
     ),
   );
   const { amounts, contracts } = await page.evaluate(() => {
@@ -249,7 +251,8 @@ const scanOrders = async (): Promise<Order[]> => {
       for (const { regex, array } of Object.values(map))
         if (regex.test(element.innerText)) {
           console.log("array", array);
-          array.push(element.innerText.match(regex)[1]);
+          const match = element.innerText.match(regex);
+          if (match) array.push(match[1]);
         }
     });
     return Object.entries(map).reduce((acc, [key, { array }]) => {

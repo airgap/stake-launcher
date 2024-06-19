@@ -15,11 +15,12 @@ export const setSome = async (group: Partial<Settings>) => {
   setSettings({ ...settings, ...group });
 };
 
-export const getSettings = () => settings;
+export const getSettings = (): Settings | undefined => settings;
 
 export const setSettings = (s?: Settings) => {
   settings = s;
   subscribers.forEach((callback) => callback());
+  console.log("setSettings", settings);
 };
 
 export const subscribeToSettings = (callback: () => void) => {
@@ -29,7 +30,7 @@ export const subscribeToSettings = (callback: () => void) => {
   };
 };
 
-export const useSettings = () =>
+export const useSettings = (): Settings | undefined =>
   useSyncExternalStore(subscribeToSettings, getSettings);
 
 // export const useSettingsStatus = () => {

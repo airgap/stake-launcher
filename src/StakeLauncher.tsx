@@ -7,6 +7,7 @@ import { Flashbar, FlashbarProps } from "@cloudscape-design/components";
 import MessageDefinition = FlashbarProps.MessageDefinition;
 import { Order, Plan } from "./preload";
 import { Bubbles } from "./Bubbles";
+import { Settings } from "./settingsModel";
 const { electronAPI } = window as any;
 export const Unchecked = () => <i>unchecked</i>;
 export const sendSms = (balance: number) => false;
@@ -41,9 +42,9 @@ export const StakeLauncher = () => {
   const settings = useSettings();
   const balance = useBalance();
   const [lastAlert, setLastAlert] = useState(0);
-  const [sms, setSms] = useState<boolean>(false);
+  // const [sms, setSms] = useState<boolean>(false);
   const [notifyThreshold, setNotifyThreshold] = useState(
-    settings?.notifyThreshold,
+    settings?.notifyThreshold?.toFixed(2) ?? "",
   );
   const [apiKey, setApiKey] = useState(settings?.apiKey ?? "");
   const [farmEmail, setFarmEmail] = useState(settings?.farmEmail ?? "");
@@ -69,7 +70,7 @@ export const StakeLauncher = () => {
   };
   const checkBalance = async () => {
     setQuerying(true);
-    await (window as any).electronAPI.getBalance();
+    await electronAPI.getBalance();
     setQuerying(false);
   };
   const Check = ({ onClick }: { onClick: () => void }) => (
@@ -79,12 +80,12 @@ export const StakeLauncher = () => {
   );
 
   useEffect(() => {
-    if (!(sms && notifyThreshold)) return;
-    if (balance > notifyThreshold && balance > lastAlert) {
+    if (!(settings?.sms && settings.notifyThreshold && balance)) return;
+    if (balance > settings.notifyThreshold && balance > lastAlert) {
       setLastAlert(balance);
       sendSms(balance);
     }
-  }, [sms, balance, lastAlert, notifyThreshold]);
+  }, [settings?.sms, balance, lastAlert, settings?.notifyThreshold]);
 
   useEffect(() => {
     electronAPI.onPlansUpdate(setPlans);
@@ -98,11 +99,22 @@ export const StakeLauncher = () => {
       orders
         .filter((order) => order.nextPayment > now)
         .map(
-          (order) => plans.find((plan) => plan.name === order.contract).daily,
+          (order) => plans.find((plan) => plan.name === order.contract)?.daily,
         )
-        .reduce((a, b) => a + b),
+        .reduce((a, b) => (a ?? 0) + (b ?? 0)),
     );
   }, [orders, plans]);
+
+  useEffect(() => {
+    setApiKey(settings?.apiKey ?? "");
+  }, [settings?.apiKey]);
+  console.log("api key", settings?.apiKey, "loaded", apiKey);
+
+  // useEffect(() => {
+  //     setApiKey(settings.apiKey)
+  //     setNotifyThreshold(settings.notifyThreshold?.toFixed(2))
+  //     setAutobuyThreshold(settings.autobuyThreshold)
+  // },[settings])
 
   // useEffect(() => {
   //   electronAPI.getPlans();
@@ -131,26 +143,64 @@ export const StakeLauncher = () => {
       <table>
         <tbody>
           {settings?.apiKey && (
-            <tr>
-              <td>
-                <input
-                  type="checkbox"
-                  onChange={(e) => setSms(e.target.checked)}
-                />
-              </td>
-              <td>Enable SMS</td>
-            </tr>
-          )}
-          {apiKey && (
-            <tr>
-              <td></td>
-              <td>SMS threshold</td>
-              <td>
-                <div className="currencyInput">
-                  <input type="number" min={0} value={notifyThreshold} />
-                </div>
-              </td>
-            </tr>
+            <>
+              <tr>
+                <td>
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      const set = {
+                        ...settings,
+                        sms: e.currentTarget.checked,
+                      } as Settings;
+                      setSettings(set);
+                      electronAPI.settingsChanged(set);
+                    }}
+                  />
+                </td>
+                <td>Enable SMS</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>SMS threshold</td>
+                <td>
+                  <div className="currencyInput">
+                    <input
+                      type="number"
+                      min={0}
+                      value={notifyThreshold}
+                      onInput={(e) => setNotifyThreshold(e.currentTarget.value)}
+                    />
+                  </div>
+                </td>
+                {notifyThreshold &&
+                  parseFloat(notifyThreshold) !== settings?.notifyThreshold && (
+                    <td>
+                      <button
+                        onClick={() => {
+                          const set = {
+                            ...settings,
+                            notifyThreshold: parseFloat(notifyThreshold),
+                          } as Settings;
+                          setSettings(set);
+                          electronAPI.settingsChanged(set);
+                        }}
+                      >
+                        ✔️
+                      </button>
+                      <button
+                        onClick={() =>
+                          setNotifyThreshold(
+                            settings?.notifyThreshold?.toFixed(2) ?? "",
+                          )
+                        }
+                      >
+                        ❌
+                      </button>
+                    </td>
+                  )}
+              </tr>
+            </>
           )}
         </tbody>
       </table>
@@ -200,8 +250,8 @@ export const StakeLauncher = () => {
         <button
           className="link"
           onClick={() => {
-            setFarmEmail(farmEmail || undefined);
-            setFarmPassword(farmPassword || undefined);
+            setFarmEmail(settings?.farmEmail || "");
+            setFarmPassword(settings?.farmPassword || "");
             setFarmCredModal(false);
           }}
         >
@@ -229,7 +279,7 @@ export const StakeLauncher = () => {
               apiKey: apiKey || undefined,
             };
             setSettings(newSettings || undefined);
-            (window as any).electronAPI.settingsChanged(newSettings);
+            electronAPI.settingsChanged(newSettings);
             setApiKeyModal(false);
           }}
         >
@@ -238,8 +288,8 @@ export const StakeLauncher = () => {
         <button
           className="link"
           onClick={() => {
-            setFarmEmail(farmEmail || undefined);
-            setFarmPassword(farmPassword || undefined);
+            setFarmEmail(settings?.farmEmail ?? "");
+            setFarmPassword(settings?.farmPassword ?? "");
             setApiKeyModal(false);
           }}
         >

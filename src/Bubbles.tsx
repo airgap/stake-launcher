@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Bubble } from "./Bubble";
 import useInterval from "./useInterval";
-export const Bubbles = ({ daily }: { daily: number }) => {
+export const Bubbles = ({ daily }: { daily?: number }) => {
   const [bubbles, setBubbles] = useState<Record<string, ReactNode>>({});
   const interval = 5000;
   useInterval(() => {

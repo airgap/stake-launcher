@@ -33,7 +33,7 @@ export const Bubble = ({
       className={styles.Bubble}
       style={{
         filter: `blur(${5 - y / 20}px)`,
-        opacity: y / 100,
+        opacity: y / 50 + 0.5,
         left: 50 + Math.sin(y / 25 + phase) * 25 + "vw",
         top: y + "vh",
         transform: `scale(${ySpeed * 2 + 0.5}) translate(-50%, -50%)`,
