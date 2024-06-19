@@ -80,14 +80,14 @@ jobs:
       - run:
           name: Upload binaries to GitHub Release
           command: |
-            CURRENT_VERSION=$(jq -r .version package.json)
+            CURRENT_VERSION="v$(jq -r .version package.json)"
             LATEST_VERSION=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' | sed 's/^v//')
             if [ "$(printf '%s\n%s\n' "$LATEST_VERSION" "$CURRENT_VERSION" | sort -V | head -n1)" = "$CURRENT_VERSION" ] && [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
-            echo "New version $CURRENT_VERSION is greater than $LATEST_VERSION"
-            ls out
-            gh release create "v$CURRENT_VERSION" out/make/deb/x64/* out/make/rpm/x64/* out/make/squirrel.windows/x64/StakeLauncher* out/make/zip/darwin/arm64/* --title "Release v$CURRENT_VERSION" --notes "Automated release of binaries"
+              echo "New version $CURRENT_VERSION is greater than $LATEST_VERSION"
+              ls out
+              gh release create "v$CURRENT_VERSION" out/make/deb/x64/* out/make/rpm/x64/* out/make/squirrel.windows/x64/StakeLauncher* out/make/zip/darwin/arm64/* --title "Release v$CURRENT_VERSION" --notes "Automated release of binaries"
             else
-            echo "Current version $CURRENT_VERSION is not greater than $LATEST_VERSION. Skipping deployment."
+              echo "Current version $CURRENT_VERSION is not greater than $LATEST_VERSION. Skipping deployment."
             fi
 workflows:
   version: 2
