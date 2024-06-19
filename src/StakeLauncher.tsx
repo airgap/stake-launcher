@@ -109,7 +109,6 @@ export const StakeLauncher = () => {
   // }, []);
   return (
     <div>
-      <Bubbles daily={totalDaily} />
       <Flashbar items={notifications} />
       <center>
         <h2>
@@ -161,6 +160,7 @@ export const StakeLauncher = () => {
       <button className="link" onClick={() => setApiKeyModal(true)}>
         Set API key
       </button>
+      <Bubbles daily={totalDaily} />
       <Modal
         open={farmCredModal}
         onClose={() => setFarmCredModal(false)}

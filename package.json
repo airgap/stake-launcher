@@ -1,7 +1,7 @@
 {
   "name": "stake-launcher",
   "productName": "stake-launcher",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "My Electron application description",
   "main": ".webpack/main",
   "scripts": {
@@ -31,7 +31,7 @@
     "@typescript-eslint/parser": "^5.0.0",
     "@vercel/webpack-asset-relocator-loader": "1.7.3",
     "awaitx": "^0.0.7",
-    "css-loader": "^6.0.0",
+    "css-loader": "^6.11.0",
     "electron": "30.1.0",
     "electron-builder": "^24.13.3",
     "electron-wix-msi": "^5.1.3",
@@ -41,7 +41,9 @@
     "from-schema": "^0.0.9",
     "node-loader": "^2.0.0",
     "react-responsive-modal": "^6.4.2",
-    "style-loader": "^3.0.0",
+    "sass": "^1.77.6",
+    "sass-loader": "^14.2.1",
+    "style-loader": "^3.3.4",
     "ts-loader": "^9.2.2",
     "ts-node": "^10.0.0",
     "typescript": "^5.4.5",
