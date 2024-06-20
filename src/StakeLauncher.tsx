@@ -1,13 +1,15 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import { useBalance } from "./balanceStore";
 import { setSettings, useSettings } from "./reactSettingsStore";
 import "react-responsive-modal/styles.css";
-import { Modal, ModalProps } from "react-responsive-modal";
+import { ModalProps } from "react-responsive-modal";
 import { Flashbar, FlashbarProps } from "@cloudscape-design/components";
 import MessageDefinition = FlashbarProps.MessageDefinition;
 import { Order, Plan } from "./preload";
 import { Bubbles } from "./Bubbles";
 import { Settings } from "./settingsModel";
+import { ApiKeyModal } from "./ApiKeyModal";
+import { FarmCredModal } from "./FarmCredModal";
 const { electronAPI } = window as any;
 export const Unchecked = () => <i>unchecked</i>;
 export const sendSms = (balance: number) => false;
@@ -45,11 +47,6 @@ export const StakeLauncher = () => {
   // const [sms, setSms] = useState<boolean>(false);
   const [notifyThreshold, setNotifyThreshold] = useState(
     settings?.notifyThreshold?.toFixed(2) ?? "",
-  );
-  const [apiKey, setApiKey] = useState(settings?.apiKey ?? "");
-  const [farmEmail, setFarmEmail] = useState(settings?.farmEmail ?? "");
-  const [farmPassword, setFarmPassword] = useState(
-    settings?.farmPassword ?? "",
   );
   const [autobuy, setAutobuy] = useState(false);
   const [autobuyThreshold, setAutobuyThreshold] = useState(
@@ -211,91 +208,11 @@ export const StakeLauncher = () => {
         Set API key
       </button>
       <Bubbles daily={totalDaily} />
-      <Modal
+      <FarmCredModal
         open={farmCredModal}
         onClose={() => setFarmCredModal(false)}
-        styles={modalStyles}
-      >
-        <h3>Farm email</h3>
-        <input
-          type="email"
-          value={farmEmail}
-          onChange={(e) => setFarmEmail(e.target.value)}
-        />
-        <h3>Farm password</h3>
-        <input
-          type="password"
-          value={farmPassword}
-          onChange={(e) => setFarmPassword(e.target.value)}
-        />
-        <p>
-          Careful with this! Please don't put your main wallet here. This is
-          just for development.
-        </p>
-        <button
-          className="link"
-          onClick={() => {
-            const newSettings = {
-              ...settings,
-              farmEmail: farmEmail || undefined,
-              farmPassword: farmPassword || undefined,
-            };
-            setSettings(newSettings);
-            (window as any).electronAPI.settingsChanged(newSettings);
-            setFarmCredModal(false);
-          }}
-        >
-          Save
-        </button>
-        <button
-          className="link"
-          onClick={() => {
-            setFarmEmail(settings?.farmEmail || "");
-            setFarmPassword(settings?.farmPassword || "");
-            setFarmCredModal(false);
-          }}
-        >
-          Cancel
-        </button>
-      </Modal>
-      <Modal
-        open={apiKeyModal}
-        onClose={() => setApiKeyModal(false)}
-        styles={modalStyles}
-      >
-        <h3>API key</h3>
-        <input
-          type="password"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-        />
-        <br />
-        <br />
-        <button
-          className="link"
-          onClick={() => {
-            const newSettings = {
-              ...settings,
-              apiKey: apiKey || undefined,
-            };
-            setSettings(newSettings || undefined);
-            electronAPI.settingsChanged(newSettings);
-            setApiKeyModal(false);
-          }}
-        >
-          Save
-        </button>
-        <button
-          className="link"
-          onClick={() => {
-            setFarmEmail(settings?.farmEmail ?? "");
-            setFarmPassword(settings?.farmPassword ?? "");
-            setApiKeyModal(false);
-          }}
-        >
-          Cancel
-        </button>
-      </Modal>
+      />
+      <ApiKeyModal open={apiKeyModal} onClose={() => setApiKeyModal(false)} />
       <footer>Development usage only</footer>
     </div>
   );

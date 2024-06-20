@@ -1,5 +1,4 @@
 import { ObjectSchema, FromSchema } from "from-schema";
-export type Settings = FromSchema<typeof settingsModel>;
 export const settingsModel = {
   type: "object",
   properties: {
@@ -43,4 +42,5 @@ export const settingsModel = {
   },
   required: [],
 } as const satisfies ObjectSchema;
+export type Settings = FromSchema<typeof settingsModel>;
 export type Setting = keyof Settings;
