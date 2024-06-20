@@ -2,6 +2,9 @@
 
 Desktop client for StakingFarm that supports automatic dividend staking and SMS notifications
 
+## Prerequisites
+
+1. NodeJS - https://nodejs.org/en/download/prebuilt-installer
 ## Usage
 
 ```shell
