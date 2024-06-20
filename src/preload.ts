@@ -18,7 +18,8 @@ export type Order = {
 };
 
 // Custom invoke function to handle no timeout
-const invoke = (channel: string, ...args: unknown[]) => new Promise((resolve, reject) => {
+const invoke = (channel: string, ...args: unknown[]) =>
+  new Promise((resolve, reject) => {
     ipcRenderer.once(`${channel}-response`, (event, response) => {
       resolve(response);
     });
