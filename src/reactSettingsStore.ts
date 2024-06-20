@@ -1,6 +1,4 @@
-import { ReactNode, useEffect, useState, useSyncExternalStore } from "react";
-// import {ipcRenderer} from 'electron';
-const { electronAPI } = window as any;
+import { useSyncExternalStore } from "react";
 import { Settings, Setting } from "./settingsModel";
 const subscribers = new Set<() => void>();
 
@@ -66,8 +64,7 @@ export const useSettings = (): Settings | undefined =>
 //   return { balance: settings, loading, error };
 // };
 
-console.log("electronAPI", electronAPI);
-electronAPI.onSettingsLoaded(setSettings);
+window.electronAPI.onSettingsLoaded(setSettings);
 
 // Load currentUser from electron store on initial load
 // ipcRenderer.on('settingsLoaded', setSettings);

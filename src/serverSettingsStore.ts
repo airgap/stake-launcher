@@ -1,6 +1,6 @@
 import { Settings } from "./settingsModel";
-import { stat, readFile, writeFile } from "fs/promises";
-import { BrowserWindow, ipcMain } from "electron";
+import { readFile, writeFile } from "fs/promises";
+import { BrowserWindow } from "electron";
 
 export let serverSettingsStore: Settings | undefined;
 export const loadSettings = async (mainWindow?: BrowserWindow) => {

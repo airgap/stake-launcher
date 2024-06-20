@@ -1,7 +1,6 @@
-import { ReactNode, useEffect, useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 const subscribers = new Set<() => void>();
 // import {ipcRenderer} from 'electron';
-const { electronAPI } = window as any;
 let balance: number | undefined = undefined;
 
 export const getBalance = () => balance;
@@ -21,7 +20,7 @@ export const subscribeToBalance = (callback: () => void) => {
 export const useBalance = () =>
   useSyncExternalStore(subscribeToBalance, getBalance);
 
-electronAPI.onBalanceUpdate(setBalance);
+window.electronAPI.onBalanceUpdate(setBalance);
 
 // Load currentUser from electron store on initial load
 // const storedBalance = store.get("balance");

@@ -1,4 +1,4 @@
-import puppeteer, { Browser, Cookie, Page } from "puppeteer";
+import puppeteer, { Cookie, Page } from "puppeteer";
 
 import { app, BrowserWindow, ipcMain } from "electron";
 import { Settings } from "./settingsModel";

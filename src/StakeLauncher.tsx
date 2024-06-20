@@ -10,7 +10,15 @@ import { Bubbles } from "./Bubbles";
 import { Settings } from "./settingsModel";
 import { ApiKeyModal } from "./ApiKeyModal";
 import { FarmCredModal } from "./FarmCredModal";
-const { electronAPI } = window as any;
+const {
+  getBalance,
+  onOrdersUpdate,
+  getOrders,
+  onPlansUpdate,
+  getPlans,
+  onError,
+  settingsChanged,
+} = window.electronAPI;
 export const Unchecked = () => <i>unchecked</i>;
 export const sendSms = (balance: number) => false;
 export const StakeLauncher = () => {
@@ -25,7 +33,7 @@ export const StakeLauncher = () => {
     ]);
   };
   useEffect(() => {
-    electronAPI.onError((error: Error) => {
+    onError((error: Error) => {
       const label = Math.random().toString().substring(2);
       setNotifications([
         ...notifications,
@@ -67,7 +75,7 @@ export const StakeLauncher = () => {
   };
   const checkBalance = async () => {
     setQuerying(true);
-    await electronAPI.getBalance();
+    await getBalance();
     setQuerying(false);
   };
   const Check = ({ onClick }: { onClick: () => void }) => (
@@ -85,8 +93,8 @@ export const StakeLauncher = () => {
   }, [settings?.sms, balance, lastAlert, settings?.notifyThreshold]);
 
   useEffect(() => {
-    electronAPI.onPlansUpdate(setPlans);
-    electronAPI.onOrdersUpdate(setOrders);
+    onPlansUpdate(setPlans);
+    onOrdersUpdate(setOrders);
   }, []);
   useEffect(() => {
     console.log("orders", orders, "plans", plans);
@@ -102,11 +110,6 @@ export const StakeLauncher = () => {
     );
   }, [orders, plans]);
 
-  useEffect(() => {
-    setApiKey(settings?.apiKey ?? "");
-  }, [settings?.apiKey]);
-  console.log("api key", settings?.apiKey, "loaded", apiKey);
-
   // useEffect(() => {
   //     setApiKey(settings.apiKey)
   //     setNotifyThreshold(settings.notifyThreshold?.toFixed(2))
@@ -114,7 +117,7 @@ export const StakeLauncher = () => {
   // },[settings])
 
   // useEffect(() => {
-  //   electronAPI.getPlans();
+  //   getPlans();
   // }, []);
   return (
     <div>
@@ -130,8 +133,8 @@ export const StakeLauncher = () => {
           <Check
             onClick={async () => {
               setQuerying(true);
-              await electronAPI.getPlans();
-              await electronAPI.getOrders();
+              await getPlans();
+              await getOrders();
               setQuerying(false);
             }}
           />
@@ -151,7 +154,7 @@ export const StakeLauncher = () => {
                         sms: e.currentTarget.checked,
                       } as Settings;
                       setSettings(set);
-                      electronAPI.settingsChanged(set);
+                      settingsChanged(set);
                     }}
                   />
                 </td>
@@ -180,7 +183,7 @@ export const StakeLauncher = () => {
                             notifyThreshold: parseFloat(notifyThreshold),
                           } as Settings;
                           setSettings(set);
-                          electronAPI.settingsChanged(set);
+                          settingsChanged(set);
                         }}
                       >
                         ✔️

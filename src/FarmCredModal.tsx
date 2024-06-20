@@ -1,4 +1,4 @@
-import { Modal, ModalProps } from "react-responsive-modal";
+import { ModalProps } from "react-responsive-modal";
 import { setSettings, settings } from "./reactSettingsStore";
 import { StakeModal } from "./StakeModal";
 import { useState } from "react";
@@ -29,14 +29,14 @@ export const FarmCredModal = (props: ModalProps) => {
       </p>
       <button
         className="link"
-        onClick={() => {
+        onClick={async () => {
           const newSettings = {
             ...settings,
             farmEmail: farmEmail || undefined,
             farmPassword: farmPassword || undefined,
           } satisfies Settings;
           setSettings(newSettings);
-          (window as any).electronAPI.settingsChanged(newSettings);
+          await window.electronAPI.settingsChanged(newSettings);
           props.onClose();
         }}
       >

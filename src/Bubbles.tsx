@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode, useState } from "react";
 import { Bubble } from "./Bubble";
 import useInterval from "./useInterval";
 export const Bubbles = ({ daily }: { daily?: number }) => {
