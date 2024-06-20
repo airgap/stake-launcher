@@ -16,28 +16,40 @@ export type Order = {
   lastPayment: number;
   nextPayment: number;
 };
+
+// Custom invoke function to handle no timeout
+const invoke = (channel: string, ...args: unknown[]) => new Promise((resolve, reject) => {
+    ipcRenderer.once(`${channel}-response`, (event, response) => {
+      resolve(response);
+    });
+
+    ipcRenderer.once(`${channel}-error`, (event, error) => {
+      reject(error);
+    });
+
+    ipcRenderer.send(channel, ...args);
+  });
 const bridgeFunctions = {
-  getOrders: () => ipcRenderer.invoke("get-orders"),
+  getOrders: () => invoke("get-orders"),
   onOrdersUpdate: (callback: (orders: Order[]) => void) =>
     ipcRenderer.on("orders-update", (event, orders: Order[]) =>
       callback(orders),
     ),
-  getPlans: () => ipcRenderer.invoke("get-plans"),
+  getPlans: () => invoke("get-plans"),
   onPlansUpdate: (callback: (plans: Plan[]) => void) =>
     ipcRenderer.on("plans-update", (event, plans: Plan[]) => callback(plans)),
-  getBalance: () => ipcRenderer.invoke("get-balance"),
+  getBalance: () => invoke("get-balance"),
   onBalanceUpdate: (callback: (newBalance: number) => void) =>
     ipcRenderer.on("balance-update", (event, newBalance) =>
       callback(newBalance),
     ),
-  getSettings: () => ipcRenderer.invoke("get-settings"),
+  getSettings: () => invoke("get-settings"),
   onSettingsLoaded: (callback: (settings: Settings) => void) =>
     ipcRenderer.on("settings-loaded", (event, settings) => {
       console.log("Got event from main!", event, settings);
       callback(settings);
     }),
-  settingsChanged: (settings: Settings) =>
-    ipcRenderer.invoke("settings-changed", settings),
+  settingsChanged: (settings: Settings) => invoke("settings-changed", settings),
   onError: (callback: (error: Error) => void) =>
     ipcRenderer.on("error", (event, error: Error) => callback(error)),
 };

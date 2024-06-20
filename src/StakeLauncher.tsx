@@ -66,13 +66,6 @@ export const StakeLauncher = () => {
   const [farmCredModal, setFarmCredModal] = useState(false);
   const [apiKeyModal, setApiKeyModal] = useState(false);
   const [querying, setQuerying] = useState(false);
-  const modalStyles: ModalProps["styles"] = {
-    modal: {
-      backgroundColor: "#000000AA",
-      backdropFilter: "blur(10px)",
-      borderRadius: "5px",
-    },
-  };
   const checkBalance = async () => {
     setQuerying(true);
     await getBalance();
