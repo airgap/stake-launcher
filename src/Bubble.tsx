@@ -11,10 +11,9 @@ export const Bubble = ({
 }) => {
   const text = useMemo(
     () =>
-      "" +
-      (amount < 1
+      amount < 1
         ? (amount * 100).toFixed(2) + "¢"
-        : "$" + (amount * 10).toFixed(2)),
+        : "$" + amount.toFixed(2),
     [amount],
   );
   // const [x, setX] = useState(Math.random() * 90 + 5);
