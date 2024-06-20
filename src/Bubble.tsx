@@ -19,7 +19,6 @@ export const Bubble = ({
       amount < 1 ? (amount * 100).toFixed(2) + "¢" : "$" + amount.toFixed(2),
     [amount],
   );
-  // const [x, setX] = useState(Math.random() * 90 + 5);
   const [y, setY] = useState(110);
   const ySpeed = useMemo(() => Math.random() / 4 + 0.1, []);
   const phase = useMemo(() => Math.random() * 100, []);
@@ -28,25 +27,23 @@ export const Bubble = ({
   const x = 50 + Math.sin(y / 25 + phase) * 25 + "vw";
   const rect = ref.current?.getBoundingClientRect();
   const callback = useCallback(setLastMouseEvent, []);
-  useEffect(() => {
-    // alert(hovered)
-    setHovered(
-      Boolean(
-        lastMouseEvent && rect && isMouseEventInRect(lastMouseEvent, rect),
+  useEffect(
+    () =>
+      setHovered(
+        Boolean(
+          lastMouseEvent && rect && isMouseEventInRect(lastMouseEvent, rect),
+        ),
       ),
-    );
-  }, [lastMouseEvent, rect?.toJSON()]);
+    [lastMouseEvent, rect?.toJSON()],
+  );
   useEffect(() => {
     window.addEventListener("mousemove", callback);
     return () => window.removeEventListener("mousemove", callback);
   }, []);
 
-  useRequestAnimationFrame(() => {
-    // Animation code goes here
-    setY((y) => y - ySpeed);
-    console.log("y", y);
-    if (y < -10) onFinish();
-  });
+  useRequestAnimationFrame(() =>
+    y < -10 ? onFinish() : setY((y) => y - ySpeed),
+  );
   return (
     <div
       ref={ref}

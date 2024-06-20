@@ -34,11 +34,6 @@ const createWindow = async (): Promise<void> => {
   // and load the index.html of the app.
   await mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   await loadSettings(mainWindow);
-
-  // mainWindow.on("ready-to-show", launchPuppeteer);
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished

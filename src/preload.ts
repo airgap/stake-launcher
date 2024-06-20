@@ -2,7 +2,6 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { Settings } from "./settingsModel";
 import { contextBridge, ipcRenderer } from "electron";
-// const { contextBridge, ipcRenderer } = require("electron");
 export type Plan = {
   name: string;
   amount: number;
