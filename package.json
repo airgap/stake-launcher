@@ -11,7 +11,7 @@
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx .",
     "clean": "rm -rf .webpack node_modules dist out settings.json cookies.json",
-    "postinstall": "node -e \"if (process.platform !== 'linux') process.exit(0); const { execSync } = require('child_process'); const fs = require('fs'); if (fs.existsSync('./node_modules/electron/dist/chrome-sandbox')) { execSync('sudo chown root ./node_modules/electron/dist/chrome-sandbox && sudo chmod 4755 ./node_modules/electron/dist/chrome-sandbox'); }\""
+    "postinstall": "node postinstall.mjs"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
