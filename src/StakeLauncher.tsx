@@ -121,8 +121,7 @@ export const StakeLauncher = () => {
           <Check onClick={checkBalance} />
         </h2>
         <h2>
-          Total daily:{" "}
-          {totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}
+          Next 24h: {totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}
           <Check
             onClick={async () => {
               setQuerying(true);
