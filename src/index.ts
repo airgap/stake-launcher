@@ -85,7 +85,13 @@ const newPageWithUrl = async (url: string, headless?: boolean) => {
 let cookies: Cookie[] = [];
 export const isPageSignin = (page: Page) => page.url().includes(urls.signin);
 export const urlBase = "https://www.stakingfarm.com/";
-export const pages = ["signin", "dashboard", "orders", "plans"] as const;
+export const pages = [
+  "signin",
+  "dashboard",
+  "orders",
+  "plans",
+  "signin/verify",
+] as const;
 export const urls = pages.reduce(
   (acc, page) => {
     acc[page] = urlBase + page;
@@ -133,7 +139,9 @@ const signIn = async () => {
     if (farmPassword) await page.locator(passwordSelector).fill(farmPassword);
     if (farmEmail && farmPassword) await page.locator("form .main_btn").click();
     await page.waitForNavigation({ timeout: 0 });
-    if (!isPageSignin(page)) signedIn = true;
+    while (page.url() === urls["signin/verify"])
+      await page.waitForNavigation({ timeout: 0 });
+    if (page.url() !== urls.signin) signedIn = true;
   }
   if (!page) return;
   cookies = await page.cookies();
