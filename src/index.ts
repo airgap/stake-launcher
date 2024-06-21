@@ -139,7 +139,7 @@ const signIn = async () => {
     if (farmPassword) await page.locator(passwordSelector).fill(farmPassword);
     if (farmEmail && farmPassword) await page.locator("form .main_btn").click();
     await page.waitForNavigation({ timeout: 0 });
-    while (page.url() === urls["signin/verify"] && attempt > 1)
+    while (page.url() === urls["signin/verify"])
       await page.waitForNavigation({ timeout: 0 });
     if (page.url() !== urls.signin) signedIn = true;
   }
