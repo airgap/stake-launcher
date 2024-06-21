@@ -234,6 +234,7 @@ const scanPlans = async (): Promise<Plan[]> => {
         total: totals[i],
       }) satisfies Plan,
   );
+  console.log("plans", plans);
   mainWindow.webContents.send("plans-update", plans);
   return plans;
 };
@@ -287,6 +288,7 @@ const scanOrders = async (): Promise<Order[]> => {
         nextPayment: parseFloat(payments[i][1]) * 1000,
       }) satisfies Order,
   );
+  console.log("orders", orders);
   mainWindow.webContents.send("orders-update", orders);
   return orders;
 };
