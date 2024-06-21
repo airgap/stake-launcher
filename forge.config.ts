@@ -23,7 +23,7 @@ const config: ForgeConfig = {
       authors: "airgap",
       exe: "stake-launcher.exe",
       setupExe: "StakeLauncherSetup.exe",
-      // setupIcon: "./src/assets/icon.ico",
+      // setupIcon: "./frontend/assets/icon.ico",
     }),
     new MakerZIP({}, ["darwin"]),
     new MakerRpm({}),
@@ -33,7 +33,7 @@ const config: ForgeConfig = {
     //   manufacturer: "airgap",
     //   exe: "stake-launcher.exe",
     //   // setupExe: 'ElectronAppSetup.exe',
-    //   // setupIcon: './src/assets/icon.ico'
+    //   // setupIcon: './frontend/assets/icon.ico'
     // }),
   ],
   plugins: [
@@ -44,11 +44,11 @@ const config: ForgeConfig = {
         config: rendererConfig,
         entryPoints: [
           {
-            html: "./src/index.html",
-            js: "./src/renderer.ts",
+            html: "./frontend/index.html",
+            js: "./frontend/renderer.ts",
             name: "main_window",
             preload: {
-              js: "./src/preload.ts",
+              js: "./frontend/preload.ts",
             },
           },
         ],

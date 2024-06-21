@@ -1,13 +1,14 @@
 import { Page } from "puppeteer";
 
 import { app, BrowserWindow, ipcMain } from "electron";
-import { Settings } from "./settingsModel";
+import { Settings } from "../frontend/settingsModel";
 import { writeFile } from "fs/promises";
 import IpcMainEvent = Electron.IpcMainEvent;
-import { createWindow, mainWindow } from "./backend/mainWindow";
-import { scanPlans } from "./backend/scanPlans";
-import { scanOrders } from "./backend/scanOrders";
-import { scanBalance } from "./backend/scanBalance";
+import { createWindow, mainWindow } from "./mainWindow";
+import { scanPlans } from "./scanPlans";
+import { scanOrders } from "./scanOrders";
+import { scanBalance } from "./scanBalance";
+import { purgeCookies } from "./cookies";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -81,3 +82,5 @@ handle("get-plans", () =>
 handle("get-orders", () =>
   scanOrders().catch((err) => mainWindow.webContents.send("error", err)),
 );
+
+handle("purge-cookies", purgeCookies);

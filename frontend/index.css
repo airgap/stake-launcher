@@ -55,7 +55,7 @@ input:hover {
   border: none;
   position: relative;
   display: inline-block;
-  margin: 5px;
+  /*margin: 5px;*/
   cursor: pointer;
   transition: 0.125s;
   /* border-bottom: 1px solid white; */
@@ -120,4 +120,11 @@ footer {
     #ff2b5780 55%,
     #ff52367f 100%
   ) !important;
+}
+h3 {
+  font-size: 1.5em;
+  margin: 10px;
+}
+td .link {
+  top: -2px;
 }

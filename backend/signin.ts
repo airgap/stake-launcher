@@ -1,8 +1,8 @@
 import { Page } from "puppeteer";
-import { serverSettingsStore } from "../serverSettingsStore";
-import { urls } from "../index";
+import { serverSettingsStore } from "../frontend/serverSettingsStore";
+import { urls } from "./index";
 import { newPageWithUrl } from "./newPageWithUrl";
-import { setCookies } from "./mainWindow";
+import { setCookies } from "./cookies";
 
 export const signIn = async () => {
   let page: Page | undefined = undefined;

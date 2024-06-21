@@ -1,6 +1,10 @@
-import { loadSettings, serverSettingsStore } from "../serverSettingsStore";
+import {
+  loadSettings,
+  serverSettingsStore,
+} from "../frontend/serverSettingsStore";
 import puppeteer from "puppeteer";
-import { cookies, mainWindow } from "./mainWindow";
+import { mainWindow } from "./mainWindow";
+import { getCookies } from "./cookies";
 
 export const newPageWithUrl = async (url: string, headless?: boolean) => {
   await loadSettings(mainWindow);
@@ -10,7 +14,7 @@ export const newPageWithUrl = async (url: string, headless?: boolean) => {
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
-  await page.setCookie(...cookies);
+  await page.setCookie(...(await getCookies()));
   await page.setRequestInterception(true);
   page.on("request", (request) => {
     if (request.url().includes("jivosite.com")) {

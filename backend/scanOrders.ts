@@ -1,7 +1,7 @@
-import { Order } from "../preload";
+import { Order } from "../frontend/preload";
 import { pageOrLogin } from "./pageOrLogin";
 import { mainWindow } from "./mainWindow";
-import { urls } from "../index";
+import { urls } from "./index";
 
 export const scanOrders = async (): Promise<Order[]> => {
   const page = await pageOrLogin(urls.orders);

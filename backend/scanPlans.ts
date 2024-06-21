@@ -1,6 +1,6 @@
-import { Plan } from "../preload";
+import { Plan } from "../frontend/preload";
 import { mainWindow } from "./mainWindow";
-import { urls } from "../index";
+import { urls } from "./index";
 import { pageOrLogin } from "./pageOrLogin";
 
 export const scanPlans = async (): Promise<Plan[]> => {

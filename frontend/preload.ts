@@ -52,6 +52,7 @@ const bridgeFunctions = {
   settingsChanged: (settings: Settings) => invoke("settings-changed", settings),
   onError: (callback: (error: Error) => void) =>
     ipcRenderer.on("error", (event, error: Error) => callback(error)),
+  purgeCookies: () => invoke("purge-cookies"),
 };
 export type ElectronAPI = typeof bridgeFunctions;
 contextBridge.exposeInMainWorld("electronAPI", bridgeFunctions);

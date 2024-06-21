@@ -3,7 +3,11 @@ import { useBalance } from "./balanceStore";
 import { setSettings, useSettings } from "./reactSettingsStore";
 import "react-responsive-modal/styles.css";
 import { ModalProps } from "react-responsive-modal";
-import { Flashbar, FlashbarProps } from "@cloudscape-design/components";
+import {
+  Flashbar,
+  FlashbarProps,
+  Spinner,
+} from "@cloudscape-design/components";
 import MessageDefinition = FlashbarProps.MessageDefinition;
 import { Order, Plan } from "./preload";
 import { Bubbles } from "./Bubbles";
@@ -18,6 +22,7 @@ const {
   getPlans,
   onError,
   settingsChanged,
+  purgeCookies,
 } = window.electronAPI;
 export const Unchecked = () => <i>unchecked</i>;
 export const sendSms = (balance: number) => false;
@@ -63,6 +68,7 @@ export const StakeLauncher = () => {
   const [plans, setPlans] = useState<Plan[]>();
   const [orders, setOrders] = useState<Order[]>();
   const [totalDaily, setTotalDaily] = useState<number>();
+  const [totalNext24h, setTotalNext24h] = useState<number>();
   const [farmCredModal, setFarmCredModal] = useState(false);
   const [apiKeyModal, setApiKeyModal] = useState(false);
   const [querying, setQuerying] = useState(false);
@@ -71,11 +77,14 @@ export const StakeLauncher = () => {
     await getBalance();
     setQuerying(false);
   };
-  const Check = ({ onClick }: { onClick: () => void }) => (
-    <button className="link" disabled={querying} onClick={onClick}>
-      Check
-    </button>
-  );
+  const Check = ({ onClick }: { onClick: () => void }) =>
+    querying ? (
+      <Spinner />
+    ) : (
+      <button className="link" onClick={onClick}>
+        Check
+      </button>
+    );
 
   useEffect(() => {
     if (!(settings?.sms && settings.notifyThreshold && balance)) return;
@@ -92,10 +101,18 @@ export const StakeLauncher = () => {
   useEffect(() => {
     console.log("orders", orders, "plans", plans);
     if (!(orders?.length && plans?.length)) return;
-    const now = +new Date();
+    const now = new Date();
+    setTotalNext24h(
+      orders
+        .filter((order) => order.nextPayment > +now)
+        .map(
+          (order) => plans.find((plan) => plan.name === order.contract)?.daily,
+        )
+        .reduce((a, b) => (a ?? 0) + (b ?? 0)),
+    );
     setTotalDaily(
       orders
-        .filter((order) => order.nextPayment > now)
+        .filter((order) => order.nextPayment > now.setHours(0, 0, 0, 0))
         .map(
           (order) => plans.find((plan) => plan.name === order.contract)?.daily,
         )
@@ -115,38 +132,72 @@ export const StakeLauncher = () => {
   return (
     <div>
       <Flashbar items={notifications} />
-      <center>
-        <h2>
-          Balance: {balance ? `$${balance.toFixed(2)}` : <Unchecked />}
-          <Check onClick={checkBalance} />
-        </h2>
-        <h2>
-          Next 24h: {totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}
-          <Check
-            onClick={async () => {
-              setQuerying(true);
-              await getPlans();
-              await getOrders();
-              setQuerying(false);
-            }}
-          />
-        </h2>
-      </center>
       <table>
         <tbody>
+          <tr>
+            <td>
+              <h3>Balance:</h3>
+            </td>
+            <td>
+              <h3>{balance ? `$${balance.toFixed(2)}` : <Unchecked />}</h3>
+            </td>
+            <td>
+              <Check onClick={checkBalance} />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <h3>Today:</h3>
+            </td>
+            <td>
+              <h3>
+                {totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}
+              </h3>
+            </td>
+            <td>
+              <Check
+                onClick={async () => {
+                  setQuerying(true);
+                  await getPlans();
+                  await getOrders();
+                  setQuerying(false);
+                }}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <h3>Next 24h:</h3>
+            </td>
+            <td>
+              <h3>
+                {totalNext24h ? `$${totalNext24h.toFixed(2)}` : <Unchecked />}
+              </h3>
+            </td>
+            <td>
+              <Check
+                onClick={async () => {
+                  setQuerying(true);
+                  await getPlans();
+                  await getOrders();
+                  setQuerying(false);
+                }}
+              />
+            </td>
+          </tr>
           {settings?.apiKey && (
             <>
               <tr>
                 <td>
                   <input
                     type="checkbox"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const set = {
                         ...settings,
                         sms: e.currentTarget.checked,
                       } as Settings;
                       setSettings(set);
-                      settingsChanged(set);
+                      await settingsChanged(set);
                     }}
                   />
                 </td>
@@ -196,11 +247,21 @@ export const StakeLauncher = () => {
           )}
         </tbody>
       </table>
-      <button className="link" onClick={() => setFarmCredModal(true)}>
-        Preload login
-      </button>
-      <button className="link" onClick={() => setApiKeyModal(true)}>
-        Set API key
+      {/*<button className="link" onClick={() => setFarmCredModal(true)}>*/}
+      {/*    Preload login*/}
+      {/*</button>*/}
+      {/*<button className="link" onClick={() => setApiKeyModal(true)}>*/}
+      {/*    Set API key*/}
+      {/*</button>*/}
+      <button
+        className="link"
+        onClick={async () => {
+          setQuerying(true);
+          await purgeCookies();
+          setQuerying(false);
+        }}
+      >
+        Purge session
       </button>
       <Bubbles daily={totalDaily} />
       <FarmCredModal

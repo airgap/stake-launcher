@@ -18,7 +18,7 @@ const rules = [
       },
       "sass-loader",
     ],
-    include: resolve(__dirname, "src"),
+    include: resolve(__dirname, "frontend"),
   },
   {
     test: /\.css$/,

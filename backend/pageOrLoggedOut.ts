@@ -1,5 +1,5 @@
 import { newPageWithUrl } from "./newPageWithUrl";
-import { isPageSignin, urls } from "../index";
+import { isPageSignin, urls } from "./index";
 
 export const pageOrLoggedOut = async (url: string) => {
   const page = await newPageWithUrl(url);
