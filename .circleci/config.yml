@@ -13,40 +13,40 @@ executors:
       - image: circleci/node:latest
 
 jobs:
-  build-windows:
-    executor: windows
-    resource_class: windows.medium
-    steps:
-      - checkout
-      - run:
-          name: Install Node.js
-          command: nvm install 20
-      - run:
-          name: Install npm packages
-          command: npm ci
-      - run:
-          name: Build Windows binary
-          command: npm run make
-      - persist_to_workspace:
-          root: .
-          paths:
-            - out/
-
-  build-macos:
-    executor: macos
-    resource_class: macos.m1.medium.gen1
-    steps:
-      - checkout
-      - run:
-          name: Install npm packages
-          command: npm ci
-      - run:
-          name: Build macOS binary
-          command: npm run make
-      - persist_to_workspace:
-          root: .
-          paths:
-            - out/
+#  build-windows:
+#    executor: windows
+#    resource_class: windows.medium
+#    steps:
+#      - checkout
+#      - run:
+#          name: Install Node.js
+#          command: nvm install 20
+#      - run:
+#          name: Install npm packages
+#          command: npm ci
+#      - run:
+#          name: Build Windows binary
+#          command: npm run make
+#      - persist_to_workspace:
+#          root: .
+#          paths:
+#            - out/
+#
+#  build-macos:
+#    executor: macos
+#    resource_class: macos.m1.medium.gen1
+#    steps:
+#      - checkout
+#      - run:
+#          name: Install npm packages
+#          command: npm ci
+#      - run:
+#          name: Build macOS binary
+#          command: npm run make
+#      - persist_to_workspace:
+#          root: .
+#          paths:
+#            - out/
 
   build-linux:
     executor: linux
@@ -99,11 +99,11 @@ jobs:
                 command: |
                   echo 'export combined="🟩 Build $REACT_APP_PIPE available!' >> "$BASH_ENV"
             - twilio/install
-            - run: IFS=',' read -r -a phone_numbers \<\<\< "$PHONE_NUMBERS"; TWILIO_TO=${phone_numbers[0]}
             - twilio/sendsms:
+                to: $PHONE_1
                 body: $(echo -e "$combined")
-            - run: IFS=',' read -r -a phone_numbers \<\<\< "$PHONE_NUMBERS"; TWILIO_TO=${phone_numbers[1]}
             - twilio/sendsms:
+                to: $PHONE_2
                 body: $(echo -e "$combined")
 workflows:
   version: 2
