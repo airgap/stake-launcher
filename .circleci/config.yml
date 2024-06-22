@@ -97,7 +97,7 @@ jobs:
             - run:
                 name: Prep message
                 command: |
-                  echo 'export combined="🟩 Build $REACT_APP_PIPE available!"' >> "$BASH_ENV"
+                  echo 'export combined="🟩 Build << pipeline.number >> available!"' >> "$BASH_ENV"
             - twilio/install
             - twilio/sendsms:
                 to: $PHONE_1
