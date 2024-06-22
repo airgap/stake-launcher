@@ -109,11 +109,11 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-#      - build-windows
-#      - build-macos
+      #      - build-windows
+      #      - build-macos
       - build-linux
       - deploy:
           requires:
-#            - build-windows
-#            - build-macos
+            #            - build-windows
+            #            - build-macos
             - build-linux

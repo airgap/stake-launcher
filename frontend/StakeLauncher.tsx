@@ -2,24 +2,21 @@ import { useEffect, useMemo, useState } from "react";
 import { useBalance } from "./balanceStore";
 import { setSettings, useSettings } from "./reactSettingsStore";
 import "react-responsive-modal/styles.css";
-import { ModalProps } from "react-responsive-modal";
 import {
-  Button,
   Flashbar,
   FlashbarProps,
-  Popover,
   Spinner,
 } from "@cloudscape-design/components";
 import MessageDefinition = FlashbarProps.MessageDefinition;
 import { Order, Plan } from "./preload";
-import { Bubbles } from "./Bubbles";
-import { Settings } from "./settingsModel";
-import { ApiKeyModal } from "./ApiKeyModal";
-import { FarmCredModal } from "./FarmCredModal";
-import { Info } from "./Info";
-import { Tooltip } from "./Tooltip";
-import useTime from "./useTime";
+import { Bubbles } from "./Bubbles/Bubbles";
+import { Settings } from "../models/settingsModel";
+import { ApiKeyModal } from "./modals/ApiKeyModal";
+import { FarmCredModal } from "./modals/FarmCredModal";
+import { Tooltip } from "./Tooltip/Tooltip";
+import { useTime } from "./useTime";
 import { timeUntil } from "./timeUntil";
+import {sendSms} from "./sendSms";
 const {
   getBalance,
   onOrdersUpdate,
@@ -31,7 +28,6 @@ const {
   purgeCookies,
 } = window.electronAPI;
 export const Unchecked = () => <i>unchecked</i>;
-export const sendSms = (balance: number) => false;
 export const StakeLauncher = () => {
   const [notifications, setNotifications] = useState<MessageDefinition[]>([]);
   const dismissNotification = (label: string) => {
@@ -98,12 +94,12 @@ export const StakeLauncher = () => {
   );
 
   useEffect(() => {
-    if (!(settings?.sms && settings.notifyThreshold && balance)) return;
+    if (!(settings?.sms && settings.apiKey && settings.notifyThreshold && balance)) return;
     if (balance > settings.notifyThreshold && balance > lastAlert) {
       setLastAlert(balance);
       sendSms(balance);
     }
-  }, [settings?.sms, balance, lastAlert, settings?.notifyThreshold]);
+  }, [settings?.sms, balance, lastAlert, settings?.notifyThreshold, settings?.apiKey]);
 
   useEffect(() => {
     onPlansUpdate(setPlans);

@@ -1,7 +1,7 @@
 import { Page } from "puppeteer";
 
 import { app, BrowserWindow, ipcMain } from "electron";
-import { Settings } from "../frontend/settingsModel";
+import { Settings } from "../models/settingsModel";
 import { writeFile } from "fs/promises";
 import IpcMainEvent = Electron.IpcMainEvent;
 import { createWindow, mainWindow } from "./mainWindow";

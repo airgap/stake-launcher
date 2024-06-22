@@ -10,7 +10,7 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 
 import { mainConfig } from "./webpack.main.config";
 import { rendererConfig } from "./webpack.renderer.config";
-import MakerWix from "@electron-forge/maker-wix";
+// import MakerWix from "@electron-forge/maker-wix";
 
 const config: ForgeConfig = {
   packagerConfig: {

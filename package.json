@@ -9,9 +9,11 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx .",
+    "fix": "prettier -c . && eslint --ext .ts,.tsx .",
+    "format": "prettier -w . && eslint --ext .ts,.tsx --fix .",
     "clean": "rm -rf .webpack node_modules dist out settings.json cookies.json",
-    "postinstall": "ts-node postinstall.ts"
+    "postinstall": "ts-node postinstall.ts",
+    "precommit": "npm run fix"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",

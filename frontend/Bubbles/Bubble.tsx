@@ -1,6 +1,6 @@
 import styles from "./Bubble.module.sass";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRequestAnimationFrame } from "./useRequestAnimationFrame";
+import { useRequestAnimationFrame } from "../useRequestAnimationFrame";
 const isMouseEventInRect = (event: MouseEvent, rect: DOMRect): boolean =>
   event.clientX >= rect.left &&
   event.clientX <= rect.right &&

@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { Settings, Setting } from "./settingsModel";
+import { Settings, Setting } from "../models/settingsModel";
 const subscribers = new Set<() => void>();
 
 export let settings: Settings | undefined;

@@ -1,8 +1,8 @@
 import { ModalProps } from "react-responsive-modal";
 import { StakeModal } from "./StakeModal";
-import { setSettings, settings } from "./reactSettingsStore";
+import { setSettings, settings } from "../reactSettingsStore";
 import { useState } from "react";
-import { Settings } from "./settingsModel";
+import { Settings } from "../../models/settingsModel";
 export const ApiKeyModal = (props: ModalProps) => {
   const [apiKey, setApiKey] = useState(settings?.apiKey ?? "");
   return (
