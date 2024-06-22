@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useBalance } from "./balanceStore";
 import { setSettings, useSettings } from "./reactSettingsStore";
 import "react-responsive-modal/styles.css";
 import { ModalProps } from "react-responsive-modal";
 import {
+  Button,
   Flashbar,
   FlashbarProps,
+  Popover,
   Spinner,
 } from "@cloudscape-design/components";
 import MessageDefinition = FlashbarProps.MessageDefinition;
@@ -14,6 +16,10 @@ import { Bubbles } from "./Bubbles";
 import { Settings } from "./settingsModel";
 import { ApiKeyModal } from "./ApiKeyModal";
 import { FarmCredModal } from "./FarmCredModal";
+import { Info } from "./Info";
+import { Tooltip } from "./Tooltip";
+import useTime from "./useTime";
+import { timeUntil } from "./timeUntil";
 const {
   getBalance,
   onOrdersUpdate,
@@ -56,6 +62,7 @@ export const StakeLauncher = () => {
   }, []);
   const settings = useSettings();
   const balance = useBalance();
+  const time = useTime();
   const [lastAlert, setLastAlert] = useState(0);
   // const [sms, setSms] = useState<boolean>(false);
   const [notifyThreshold, setNotifyThreshold] = useState(
@@ -72,19 +79,23 @@ export const StakeLauncher = () => {
   const [farmCredModal, setFarmCredModal] = useState(false);
   const [apiKeyModal, setApiKeyModal] = useState(false);
   const [querying, setQuerying] = useState(false);
-  const checkBalance = async () => {
+  const scanSite = async () => {
     setQuerying(true);
     await getBalance();
+    await Promise.all([getPlans(), getOrders()]);
     setQuerying(false);
   };
-  const Check = ({ onClick }: { onClick: () => void }) =>
-    querying ? (
-      <Spinner />
-    ) : (
-      <button className="link" onClick={onClick}>
-        Check
-      </button>
-    );
+  const check = useMemo(
+    () =>
+      querying ? (
+        <Spinner />
+      ) : (
+        <button className="link" onClick={scanSite}>
+          ↻
+        </button>
+      ),
+    [querying],
+  );
 
   useEffect(() => {
     if (!(settings?.sms && settings.notifyThreshold && balance)) return;
@@ -97,28 +108,35 @@ export const StakeLauncher = () => {
   useEffect(() => {
     onPlansUpdate(setPlans);
     onOrdersUpdate(setOrders);
+    void scanSite();
   }, []);
+  const [nextExpire, setNextExpire] = useState<Order>();
   useEffect(() => {
-    console.log("orders", orders, "plans", plans);
+    console.log("orders", orders);
     if (!(orders?.length && plans?.length)) return;
-    const now = new Date();
-    setTotalNext24h(
+    const findPlansAndAdd = (orders: Order[]) =>
       orders
-        .filter((order) => order.nextPayment > +now)
         .map(
           (order) => plans.find((plan) => plan.name === order.contract)?.daily,
         )
-        .reduce((a, b) => (a ?? 0) + (b ?? 0)),
+        .reduce((a, b) => (a ?? 0) + (b ?? 0));
+    const ordersAfterThisMorning = orders.filter(
+      (order) => order.nextPayment > new Date(time).setHours(0, 0, 0, 0),
     );
-    setTotalDaily(
+    const futureOrders = ordersAfterThisMorning.filter(
+      (order) => order.nextPayment > +time,
+    );
+    setTotalNext24h(findPlansAndAdd(futureOrders));
+    setTotalDaily(findPlansAndAdd(ordersAfterThisMorning));
+    setNextExpire(
       orders
-        .filter((order) => order.nextPayment > now.setHours(0, 0, 0, 0))
-        .map(
-          (order) => plans.find((plan) => plan.name === order.contract)?.daily,
-        )
-        .reduce((a, b) => (a ?? 0) + (b ?? 0)),
+        .filter((o) => o.expires > +time)
+        .reduce((l, r) => (l.expires < r.expires ? l : r)),
     );
-  }, [orders, plans]);
+  }, [orders, plans, time]);
+
+  const timeUntilNextExpire =
+    nextExpire?.expires && timeUntil(nextExpire?.expires);
 
   // useEffect(() => {
   //     setApiKey(settings.apiKey)
@@ -129,62 +147,93 @@ export const StakeLauncher = () => {
   // useEffect(() => {
   //   getPlans();
   // }, []);
+  const balanceDisplay = useMemo(
+    () => (
+      <tr>
+        <td>
+          <h3>
+            Balance
+            <Tooltip>Amount currently available to invest or withdraw</Tooltip>
+          </h3>
+        </td>
+        <td>
+          <h3>{balance ? `$${balance.toFixed(2)}` : <Unchecked />}</h3>
+        </td>
+      </tr>
+    ),
+    [balance],
+  );
+  const dailyDisplay = useMemo(
+    () => (
+      <tr>
+        <td>
+          <h3>
+            Today
+            <Tooltip>
+              Amount earned between 12:00am today and 12:00am tomorrow
+            </Tooltip>
+          </h3>
+        </td>
+        <td>
+          <h3>{totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}</h3>
+        </td>
+      </tr>
+    ),
+    [totalDaily],
+  );
+  const nextExpireDisplay = useMemo(
+    () => (
+      <tr>
+        <td>
+          <h3>
+            Next expire
+            <Tooltip>
+              {timeUntilNextExpire
+                ? `Your next order will expire in ${timeUntilNextExpire}`
+                : "The time until your next order will expire"}
+            </Tooltip>
+          </h3>
+        </td>
+        <td>
+          <h3>
+            {nextExpire ? (
+              `$${nextExpire.amount.toFixed(2)} in ${timeUntilNextExpire}`
+            ) : (
+              <Unchecked />
+            )}
+          </h3>
+        </td>
+      </tr>
+    ),
+    [nextExpire],
+  );
+  const next24HoursDisplay = useMemo(
+    () => (
+      <tr>
+        <td>
+          <h3>
+            Next 24h
+            <Tooltip>Amount earned between now and this time tomorrow</Tooltip>
+          </h3>
+        </td>
+        <td>
+          <h3>
+            {totalNext24h ? `$${totalNext24h.toFixed(2)}` : <Unchecked />}
+          </h3>
+        </td>
+      </tr>
+    ),
+    [totalNext24h],
+  );
   return (
     <div>
       <Flashbar items={notifications} />
       <table>
         <tbody>
-          <tr>
-            <td>
-              <h3>Balance:</h3>
-            </td>
-            <td>
-              <h3>{balance ? `$${balance.toFixed(2)}` : <Unchecked />}</h3>
-            </td>
-            <td>
-              <Check onClick={checkBalance} />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <h3>Today:</h3>
-            </td>
-            <td>
-              <h3>
-                {totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}
-              </h3>
-            </td>
-            <td>
-              <Check
-                onClick={async () => {
-                  setQuerying(true);
-                  await getPlans();
-                  await getOrders();
-                  setQuerying(false);
-                }}
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <h3>Next 24h:</h3>
-            </td>
-            <td>
-              <h3>
-                {totalNext24h ? `$${totalNext24h.toFixed(2)}` : <Unchecked />}
-              </h3>
-            </td>
-            <td>
-              <Check
-                onClick={async () => {
-                  setQuerying(true);
-                  await getPlans();
-                  await getOrders();
-                  setQuerying(false);
-                }}
-              />
-            </td>
-          </tr>
+          {balanceDisplay}
+          {dailyDisplay}
+          {next24HoursDisplay}
+          {nextExpireDisplay}
           {settings?.apiKey && (
             <>
               <tr>
@@ -250,9 +299,9 @@ export const StakeLauncher = () => {
       {/*<button className="link" onClick={() => setFarmCredModal(true)}>*/}
       {/*    Preload login*/}
       {/*</button>*/}
-      {/*<button className="link" onClick={() => setApiKeyModal(true)}>*/}
-      {/*    Set API key*/}
-      {/*</button>*/}
+      <button className="link" onClick={() => setApiKeyModal(true)}>
+        Set API key
+      </button>
       <button
         className="link"
         onClick={async () => {
@@ -263,6 +312,7 @@ export const StakeLauncher = () => {
       >
         Purge session
       </button>
+      {check}
       <Bubbles daily={totalDaily} />
       <FarmCredModal
         open={farmCredModal}

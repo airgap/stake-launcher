@@ -14,6 +14,7 @@ export type Order = {
   amount: number;
   lastPayment: number;
   nextPayment: number;
+  expires: number;
 };
 
 // Custom invoke function to handle no timeout

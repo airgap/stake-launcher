@@ -11,8 +11,8 @@ export const createWindow = async (): Promise<void> => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 400,
-    width: 410,
-    resizable: false,
+    width: 570,
+    resizable: true,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       // nodeIntegration: true,

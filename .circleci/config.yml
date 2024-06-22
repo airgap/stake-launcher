@@ -1,5 +1,6 @@
 version: 2.1
-
+orbs:
+  twilio: circleci/twilio@1.0.0
 executors:
   windows:
     machine:
@@ -89,6 +90,21 @@ jobs:
             else
               echo "Current version $CURRENT_VERSION is not greater than $LATEST_VERSION. Skipping deployment."
             fi
+      - when:
+          condition:
+            equal: [main, << pipeline.git.branch >>]
+          steps:
+            - run:
+                name: Prep message
+                command: |
+                  echo 'export combined="🟩 Build $REACT_APP_PIPE available!' >> "$BASH_ENV"
+            - twilio/install
+            - run: IFS=',' read -r -a phone_numbers <<< "$PHONE_NUMBERS"; TWILIO_TO=${phone_numbers[0]}
+            - twilio/sendsms:
+                body: $(echo -e "$combined")
+            - run: IFS=',' read -r -a phone_numbers <<< "$PHONE_NUMBERS"; TWILIO_TO=${phone_numbers[1]}
+            - twilio/sendsms:
+                body: $(echo -e "$combined")
 workflows:
   version: 2
   build-and-deploy:

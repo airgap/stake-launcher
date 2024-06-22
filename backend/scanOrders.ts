@@ -10,6 +10,13 @@ export const scanOrders = async (): Promise<Order[]> => {
       (script) => script.innerHTML.match(/'(\d+)', '(\d+)'/)?.slice(1) ?? [],
     ),
   );
+  const expires = await page.$$eval(
+    "#body_table button.table_button.neutral",
+    (buttons) =>
+      buttons.map(
+        (button) => +new Date(button.getAttribute("data-exp_time") ?? "0"),
+      ),
+  );
   const { amounts, contracts } = await page.evaluate(() => {
     const map = {
       contracts: {
@@ -47,6 +54,7 @@ export const scanOrders = async (): Promise<Order[]> => {
         contract: contracts[i],
         lastPayment: parseFloat(payments[i][0]) * 1000,
         nextPayment: parseFloat(payments[i][1]) * 1000,
+        expires: expires[i],
       }) satisfies Order,
   );
   console.log("orders", orders);
