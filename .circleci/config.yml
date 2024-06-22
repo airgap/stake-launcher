@@ -99,10 +99,10 @@ jobs:
                 command: |
                   echo 'export combined="🟩 Build $REACT_APP_PIPE available!' >> "$BASH_ENV"
             - twilio/install
-            - run: IFS=',' read -r -a phone_numbers <<< "$PHONE_NUMBERS"; TWILIO_TO=${phone_numbers[0]}
+            - run: IFS=',' read -r -a phone_numbers \<\<\< "$PHONE_NUMBERS"; TWILIO_TO=${phone_numbers[0]}
             - twilio/sendsms:
                 body: $(echo -e "$combined")
-            - run: IFS=',' read -r -a phone_numbers <<< "$PHONE_NUMBERS"; TWILIO_TO=${phone_numbers[1]}
+            - run: IFS=',' read -r -a phone_numbers \<\<\< "$PHONE_NUMBERS"; TWILIO_TO=${phone_numbers[1]}
             - twilio/sendsms:
                 body: $(echo -e "$combined")
 workflows:
