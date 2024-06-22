@@ -16,7 +16,7 @@ import { FarmCredModal } from "./modals/FarmCredModal";
 import { Tooltip } from "./Tooltip/Tooltip";
 import { useTime } from "./useTime";
 import { timeUntil } from "./timeUntil";
-import {sendSms} from "./sendSms";
+import { sendSms } from "./sendSms";
 const {
   getBalance,
   onOrdersUpdate,
@@ -94,12 +94,21 @@ export const StakeLauncher = () => {
   );
 
   useEffect(() => {
-    if (!(settings?.sms && settings.apiKey && settings.notifyThreshold && balance)) return;
+    if (
+      !(settings?.sms && settings.apiKey && settings.notifyThreshold && balance)
+    )
+      return;
     if (balance > settings.notifyThreshold && balance > lastAlert) {
       setLastAlert(balance);
       sendSms(balance);
     }
-  }, [settings?.sms, balance, lastAlert, settings?.notifyThreshold, settings?.apiKey]);
+  }, [
+    settings?.sms,
+    balance,
+    lastAlert,
+    settings?.notifyThreshold,
+    settings?.apiKey,
+  ]);
 
   useEffect(() => {
     onPlansUpdate(setPlans);

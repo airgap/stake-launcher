@@ -1,14 +1,14 @@
 import { Page } from "puppeteer";
 
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow } from "electron";
 import { Settings } from "../models/settingsModel";
 import { writeFile } from "fs/promises";
-import IpcMainEvent = Electron.IpcMainEvent;
 import { createWindow, mainWindow } from "./mainWindow";
 import { scanPlans } from "./scanPlans";
 import { scanOrders } from "./scanOrders";
 import { scanBalance } from "./scanBalance";
 import { purgeCookies } from "./cookies";
+import { handle } from "./handle";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -52,19 +52,6 @@ export const urls = pages.reduce(
   },
   {} as Record<(typeof pages)[number], string>,
 );
-
-export const handle = (
-  eventName: string,
-  handler: (event: IpcMainEvent, ...args: any[]) => Promise<unknown>,
-) =>
-  ipcMain.on(eventName, async (event, ...args) => {
-    try {
-      const result = await handler(event, ...args);
-      event.reply(`${eventName}-response`, result);
-    } catch (error) {
-      event.reply(`${eventName}-error`, error);
-    }
-  });
 
 handle("settings-changed", (e, settings: Settings) =>
   writeFile("./settings.json", JSON.stringify(settings, null, 4)),
