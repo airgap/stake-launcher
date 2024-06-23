@@ -1,5 +1,6 @@
 import { ObjectSchema, FromSchema } from "from-schema";
-export const settingsModel = {
+export const settings = {
+  title: "Settings",
   type: "object",
   properties: {
     farmEmail: {
@@ -42,5 +43,5 @@ export const settingsModel = {
   },
   required: [],
 } as const satisfies ObjectSchema;
-export type Settings = FromSchema<typeof settingsModel>;
+export type Settings = FromSchema<typeof settings>;
 export type Setting = keyof Settings;

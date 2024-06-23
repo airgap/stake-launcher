@@ -1,21 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-import { Settings } from "../models/settingsModel";
 import { contextBridge, ipcRenderer } from "electron";
-export type Plan = {
-  name: string;
-  amount: number;
-  daily: number;
-  duration: number;
-  total: number;
-};
-export type Order = {
-  contract: string;
-  amount: number;
-  lastPayment: number;
-  nextPayment: number;
-  expires: number;
-};
+import { Order, Plan, Settings } from "../models";
 
 // Custom invoke function to handle no timeout
 const invoke = (channel: string, ...args: unknown[]) =>

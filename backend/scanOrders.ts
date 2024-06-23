@@ -1,4 +1,4 @@
-import { Order } from "../frontend/preload";
+import { Order } from "../models";
 import { pageOrLogin } from "./pageOrLogin";
 import { mainWindow } from "./mainWindow";
 import { urls } from "./index";

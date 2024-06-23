@@ -2,7 +2,7 @@ import { ModalProps } from "react-responsive-modal";
 import { setSettings, settings } from "../reactSettingsStore";
 import { StakeModal } from "./StakeModal";
 import { useState } from "react";
-import { Settings } from "../../models/settingsModel";
+import { Settings } from "../../models/settings";
 
 export const FarmCredModal = (props: ModalProps) => {
   const [farmEmail, setFarmEmail] = useState(settings?.farmEmail ?? "");

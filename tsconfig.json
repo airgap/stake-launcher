@@ -16,7 +16,8 @@
     "jsx": "react-jsx",
     "paths": {
       "*": ["node_modules/*"]
-    }
+    },
+    "maxNodeModuleJsDepth": 1000
   },
   "include": ["frontend/**/*", "global.d.ts"]
 }

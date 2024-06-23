@@ -1,4 +1,4 @@
-import { Settings } from "../models/settingsModel";
+import { Settings } from "../models/settings";
 import { readFile, writeFile } from "fs/promises";
 import { BrowserWindow } from "electron";
 

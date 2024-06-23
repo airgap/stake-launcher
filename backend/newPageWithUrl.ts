@@ -1,7 +1,4 @@
-import {
-  loadSettings,
-  serverSettingsStore,
-} from "../frontend/serverSettingsStore";
+import { loadSettings, serverSettingsStore } from "./serverSettingsStore";
 import puppeteer from "puppeteer";
 import { mainWindow } from "./mainWindow";
 import { getCookies } from "./cookies";

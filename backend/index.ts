@@ -1,7 +1,7 @@
 import { Page } from "puppeteer";
 
 import { app, BrowserWindow } from "electron";
-import { Settings } from "../models/settingsModel";
+import { Settings } from "../models/settings";
 import { writeFile } from "fs/promises";
 import { createWindow, mainWindow } from "./mainWindow";
 import { scanPlans } from "./scanPlans";

@@ -8,9 +8,8 @@ import {
   Spinner,
 } from "@cloudscape-design/components";
 import MessageDefinition = FlashbarProps.MessageDefinition;
-import { Order, Plan } from "./preload";
+import { Order, Plan, Settings } from "../models";
 import { Bubbles } from "./Bubbles/Bubbles";
-import { Settings } from "../models/settingsModel";
 import { ApiKeyModal } from "./modals/ApiKeyModal";
 import { FarmCredModal } from "./modals/FarmCredModal";
 import { Tooltip } from "./Tooltip/Tooltip";
@@ -68,10 +67,10 @@ export const StakeLauncher = () => {
   const [autobuyThreshold, setAutobuyThreshold] = useState(
     settings?.autobuyThreshold,
   );
-  const [plans, setPlans] = useState<Plan[]>();
-  const [orders, setOrders] = useState<Order[]>();
-  const [totalDaily, setTotalDaily] = useState<number>();
-  const [totalNext24h, setTotalNext24h] = useState<number>();
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  // const [totalDaily, setTotalDaily] = useState<number>();
+  // const [totalNext24h, setTotalNext24h] = useState<number>();
   const [farmCredModal, setFarmCredModal] = useState(false);
   const [apiKeyModal, setApiKeyModal] = useState(false);
   const [querying, setQuerying] = useState(false);
@@ -115,33 +114,34 @@ export const StakeLauncher = () => {
     onOrdersUpdate(setOrders);
     void scanSite();
   }, []);
-  const [nextExpire, setNextExpire] = useState<Order>();
-  useEffect(() => {
-    console.log("orders", orders);
-    if (!(orders?.length && plans?.length)) return;
-    const findPlansAndAdd = (orders: Order[]) =>
-      orders
-        .map(
-          (order) => plans.find((plan) => plan.name === order.contract)?.daily,
-        )
-        .reduce((a, b) => (a ?? 0) + (b ?? 0));
-    const ordersAfterThisMorning = orders.filter(
-      (order) => order.nextPayment > new Date(time).setHours(0, 0, 0, 0),
-    );
-    const futureOrders = ordersAfterThisMorning.filter(
-      (order) => order.nextPayment > +time,
-    );
-    setTotalNext24h(findPlansAndAdd(futureOrders));
-    setTotalDaily(findPlansAndAdd(ordersAfterThisMorning));
-    setNextExpire(
-      orders
-        .filter((o) => o.expires > +time)
-        .reduce((l, r) => (l.expires < r.expires ? l : r)),
-    );
-  }, [orders, plans, time]);
+    const startOfDay = new Date(time).setHours(0, 0, 0, 0);
 
-  const timeUntilNextExpire =
-    nextExpire?.expires && timeUntil(nextExpire?.expires);
+// Step 2: Use a simple function to filter orders
+    const filterOrdersAfterDate = (orders: Order[], date: number): Order[] => orders.filter(({nextPayment}: {nextPayment: number}): boolean => nextPayment > date);
+
+    const ordersAfterThisMorning = useMemo<Order[]>(() => filterOrdersAfterDate(orders, startOfDay), [orders, startOfDay]);
+
+    const futureOrders = useMemo((): Order[]=> {
+        const ntime = +time;
+        return filterOrdersAfterDate(ordersAfterThisMorning, ntime)
+    },[ordersAfterThisMorning, time]);
+    const orderMap = useMemo((): Record<string, Order>=>orders.reduce((acc,o) => {
+        acc[o.contract] = o;
+        return acc;
+    }, {} as Record<string, Order>), [orders])
+    const findPlansAndAdd = (orders: Order[]): number =>
+        orders
+            .map(
+                (order: Order): number => plans.find((plan: Plan) => plan.name === order.contract)?.daily ?? 0,
+            )
+            .reduce((a, b): number => a + b);
+    const totalNext24h = useMemo(()=>findPlansAndAdd(futureOrders), [futureOrders]);
+    const totalDaily = useMemo(()=>findPlansAndAdd(ordersAfterThisMorning), [ordersAfterThisMorning]);
+    const nextExpire = useMemo((): Order=>orders
+        .filter((o) => o.expires > +time)
+        .reduce((l, r) => (l.expires < r.expires ? l : r)), [orders, time])
+    const timeUntilNextExpire =
+    nextExpire?.expires && timeUntil(nextExpire.expires);
 
   // useEffect(() => {
   //     setApiKey(settings.apiKey)

@@ -1,4 +1,4 @@
-import { Plan } from "../frontend/preload";
+import { Plan } from "../models";
 import { mainWindow } from "./mainWindow";
 import { urls } from "./index";
 import { pageOrLogin } from "./pageOrLogin";

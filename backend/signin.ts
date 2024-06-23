@@ -1,5 +1,5 @@
 import { Page } from "puppeteer";
-import { serverSettingsStore } from "../frontend/serverSettingsStore";
+import { serverSettingsStore } from "./serverSettingsStore";
 import { urls } from "./index";
 import { newPageWithUrl } from "./newPageWithUrl";
 import { setCookies } from "./cookies";
