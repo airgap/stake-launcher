@@ -1,7 +1,7 @@
 import { FromSchema, ObjectSchema } from "from-schema";
 
 export const order = {
-  title: "Order",
+  // title: "Order",
   type: "object",
   properties: {
     contract: {

@@ -10,6 +10,7 @@ export const handle = (
       const result = await handler(event, ...args);
       event.reply(`${eventName}-response`, result);
     } catch (error) {
+      console.error(error);
       event.reply(`${eventName}-error`, error);
     }
   });

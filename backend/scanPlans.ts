@@ -8,42 +8,51 @@ export const scanPlans = async (): Promise<Plan[]> => {
   const names = await page.$$eval(".plans__grid img[alt]", (imgs) =>
     imgs.map((img) => img.alt),
   );
+  type StupidKey = "durations" | "daily" | "amounts" | "totals";
+  type StupidMap = Record<StupidKey, number[]>;
   const { durations, daily, amounts, totals } = await page.evaluate(() => {
-    const map = {
-      durations: {
-        regex: /^(\d+) Days?$/,
-        array: [] as number[],
+    const map: StupidMap = {
+      durations: [],
+      daily: [],
+      amounts: [],
+      totals: [],
+    };
+    [...document.querySelectorAll<HTMLDivElement>("div.p_plans div")].forEach(
+      (div) => {
+        if (div.innerText.startsWith("Amount "))
+          map.amounts.push(
+            parseFloat(div.innerText.split(" $")[1].replace(/,/g, "")),
+          );
+        else if (div.innerText.startsWith("+ "))
+          map.totals.push(
+            parseFloat(div.innerText.split(" $")[1].replace(/,/g, "")),
+          );
       },
-      daily: {
-        regex: /^\$((?:\d|,)+\.\d+)$/,
-        array: [] as number[],
-      },
-      amounts: {
-        regex: /^Amount \$((?:\d|,)+\.\d+)$/,
-        array: [] as number[],
-      },
-      totals: {
-        regex: /^\+ \$((?:\d|,)+\.\d+)$/,
-        array: [] as number[],
-      },
-    } as const satisfies Record<string, { regex: RegExp; array: unknown[] }>;
-    type M = typeof map;
-    // type ReturnM = {[key: keyof M]: M[typeof key]['array']};
-    type ReturnM = Record<keyof M, M[keyof M]["array"]>;
-    const elements =
-      document.querySelectorAll<HTMLParagraphElement>("div.p_plans p");
-    [...elements].forEach((element) => {
-      for (const { regex, array } of Object.values(map))
-        if (regex.test(element.innerText)) {
-          console.log("array", array);
-          array.push(parseFloat(element.innerText.match(regex)?.[1] ?? "0"));
-        }
+    );
+    [
+      ...document.querySelectorAll<HTMLParagraphElement>("div.p_plans p"),
+    ].forEach((p) => {
+      if (p.innerText.startsWith("$"))
+        map.daily.push(parseFloat(p.innerText.substring(1).replace(/,/g, "")));
+      else if (p.innerText.endsWith(" Days"))
+        map.durations.push(
+          parseFloat(p.innerText.split(" ")[0].replace(/,/g, "")),
+        );
     });
-    return Object.entries(map).reduce((acc, [key, { array }]) => {
-      acc[key as keyof ReturnM] = array;
-      return acc;
-    }, {} as ReturnM);
+    return map;
   });
+  console.log(
+    "names",
+    names,
+    "amounts",
+    amounts,
+    "durations",
+    durations,
+    "daily",
+    daily,
+    "totals",
+    totals,
+  );
   const plans = names.map(
     (name, i) =>
       ({

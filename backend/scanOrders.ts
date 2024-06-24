@@ -24,7 +24,7 @@ export const scanOrders = async (): Promise<Order[]> => {
         array: [] as string[],
       },
       amounts: {
-        regex: /^\$((?:\d|,)+\.\d+)$/,
+        regex: /^(?:\$ ?)?((?:\d|,)+\.\d+)$/,
         array: [] as string[],
       },
     } as const satisfies Record<string, { regex: RegExp; array: unknown[] }>;

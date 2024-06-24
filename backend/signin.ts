@@ -29,7 +29,7 @@ export const signIn = async () => {
     if (page.url() !== urls.signin) signedIn = true;
   }
   if (!page) return;
-  setCookies(await page.cookies());
+  await setCookies(await page.cookies());
   console.log("Signed in and cached cookies");
   await page.close();
 };

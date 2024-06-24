@@ -8,7 +8,9 @@ export const scanBalance = async () => {
   await page.waitForSelector(balanceSelector);
   const balanceNode = await page.$(balanceSelector);
   const balanceText = await page.evaluate((e) => e?.innerText, balanceNode);
-  const balance = parseFloat(balanceText?.substring(2) ?? "0");
+  const balance = parseFloat(
+    balanceText?.substring(2).replace(/,/g, "") ?? "0",
+  );
   mainWindow.webContents.send("balance-update", balance);
   await page.close();
 };

@@ -1,7 +1,7 @@
 import { FromSchema, ObjectSchema } from "from-schema";
 
 export const plan = {
-  title: "Plan",
+  // title: "Plan",
   type: "object",
   properties: {
     name: {

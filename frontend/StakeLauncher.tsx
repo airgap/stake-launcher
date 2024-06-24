@@ -14,7 +14,7 @@ import { ApiKeyModal } from "./modals/ApiKeyModal";
 import { FarmCredModal } from "./modals/FarmCredModal";
 import { Tooltip } from "./Tooltip/Tooltip";
 import { useTime } from "./useTime";
-import { timeUntil } from "./timeUntil";
+import { timeSince, timeUntil } from "./timeUntil";
 import { sendSms } from "./sendSms";
 const {
   getBalance,
@@ -26,7 +26,8 @@ const {
   settingsChanged,
   purgeCookies,
 } = window.electronAPI;
-export const Unchecked = () => <i>unchecked</i>;
+import styles from "./StakeLauncher.module.sass";
+export const Unchecked = () => <i>&ndash;</i>;
 export const StakeLauncher = () => {
   const [notifications, setNotifications] = useState<MessageDefinition[]>([]);
   const dismissNotification = (label: string) => {
@@ -58,6 +59,7 @@ export const StakeLauncher = () => {
   const settings = useSettings();
   const balance = useBalance();
   const time = useTime();
+  const ntime = +time;
   const [lastAlert, setLastAlert] = useState(0);
   // const [sms, setSms] = useState<boolean>(false);
   const [notifyThreshold, setNotifyThreshold] = useState(
@@ -114,33 +116,63 @@ export const StakeLauncher = () => {
     onOrdersUpdate(setOrders);
     void scanSite();
   }, []);
-    const startOfDay = new Date(time).setHours(0, 0, 0, 0);
+  const startOfDay = new Date(time).setHours(0, 0, 0, 0);
 
-// Step 2: Use a simple function to filter orders
-    const filterOrdersAfterDate = (orders: Order[], date: number): Order[] => orders.filter(({nextPayment}: {nextPayment: number}): boolean => nextPayment > date);
+  // Step 2: Use a simple function to filter orders
+  const filterOrdersAfterDate = (orders: Order[], date: number): Order[] =>
+    orders.filter(
+      ({ nextPayment }: { nextPayment: number }): boolean => nextPayment > date,
+    );
 
-    const ordersAfterThisMorning = useMemo<Order[]>(() => filterOrdersAfterDate(orders, startOfDay), [orders, startOfDay]);
+  const ordersAfterThisMorning = useMemo<Order[]>(
+    () => filterOrdersAfterDate(orders, startOfDay),
+    [orders, startOfDay],
+  );
 
-    const futureOrders = useMemo((): Order[]=> {
-        const ntime = +time;
-        return filterOrdersAfterDate(ordersAfterThisMorning, ntime)
-    },[ordersAfterThisMorning, time]);
-    const orderMap = useMemo((): Record<string, Order>=>orders.reduce((acc,o) => {
-        acc[o.contract] = o;
-        return acc;
-    }, {} as Record<string, Order>), [orders])
-    const findPlansAndAdd = (orders: Order[]): number =>
-        orders
-            .map(
-                (order: Order): number => plans.find((plan: Plan) => plan.name === order.contract)?.daily ?? 0,
-            )
-            .reduce((a, b): number => a + b);
-    const totalNext24h = useMemo(()=>findPlansAndAdd(futureOrders), [futureOrders]);
-    const totalDaily = useMemo(()=>findPlansAndAdd(ordersAfterThisMorning), [ordersAfterThisMorning]);
-    const nextExpire = useMemo((): Order=>orders
-        .filter((o) => o.expires > +time)
-        .reduce((l, r) => (l.expires < r.expires ? l : r)), [orders, time])
-    const timeUntilNextExpire =
+  const futureOrders = useMemo((): Order[] => {
+    const ntime = +time;
+    return filterOrdersAfterDate(ordersAfterThisMorning, ntime);
+  }, [ordersAfterThisMorning, time]);
+  const orderMap = useMemo(
+    (): Record<string, Order> =>
+      orders.reduce(
+        (acc, o) => {
+          acc[o.contract] = o;
+          return acc;
+        },
+        {} as Record<string, Order>,
+      ),
+    [orders],
+  );
+  const findPlansAndAdd = (orders: Order[]): number =>
+    orders
+      .map(
+        (order: Order): number =>
+          plans.find((plan: Plan) => plan.name === order.contract)?.daily ?? 0,
+      )
+      .reduce((a, b): number => a + b, 0);
+  const totalNext24h = useMemo(
+    () => findPlansAndAdd(futureOrders),
+    [futureOrders],
+  );
+  const totalDaily = useMemo(
+    () => findPlansAndAdd(ordersAfterThisMorning),
+    [ordersAfterThisMorning],
+  );
+  const [lastExpire, nextExpire] = useMemo(() => {
+    let soonest: Order | undefined = undefined;
+    let latest: Order | undefined = undefined;
+    for (const o of orders) {
+      if (o.expires < ntime && (!latest || o.expires > latest.expires))
+        latest = o;
+      if (o.expires > ntime && (!soonest || o.expires < soonest.expires))
+        soonest = o;
+    }
+    return [latest, soonest];
+  }, [orders, ntime]);
+  const timeSinceLastExpire =
+    lastExpire?.expires && timeSince(lastExpire.expires);
+  const timeUntilNextExpire =
     nextExpire?.expires && timeUntil(nextExpire.expires);
 
   // useEffect(() => {
@@ -156,14 +188,10 @@ export const StakeLauncher = () => {
     () => (
       <tr>
         <td>
-          <h3>
-            Balance
-            <Tooltip>Amount currently available to invest or withdraw</Tooltip>
-          </h3>
+          Balance
+          <Tooltip>Amount currently available to invest or withdraw</Tooltip>
         </td>
-        <td>
-          <h3>{balance ? `$${balance.toFixed(2)}` : <Unchecked />}</h3>
-        </td>
+        <td>{balance ? `$${balance.toFixed(2)}` : <Unchecked />}</td>
       </tr>
     ),
     [balance],
@@ -172,72 +200,86 @@ export const StakeLauncher = () => {
     () => (
       <tr>
         <td>
-          <h3>
-            Today
-            <Tooltip>
-              Amount earned between 12:00am today and 12:00am tomorrow
-            </Tooltip>
-          </h3>
+          Today
+          <Tooltip>
+            Amount earned between 12:00am today and 12:00am tomorrow
+          </Tooltip>
         </td>
-        <td>
-          <h3>{totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}</h3>
-        </td>
+        <td>{totalDaily ? `$${totalDaily.toFixed(2)}` : <Unchecked />}</td>
       </tr>
     ),
     [totalDaily],
+  );
+  const lastExpireDisplay = useMemo(
+    () => (
+      <tr>
+        <td>
+          Last expire
+          <Tooltip>
+            {timeSinceLastExpire
+              ? `${lastExpire.contract} expired ${timeSinceLastExpire} ago`
+              : "How long since your last order expired"}
+          </Tooltip>
+        </td>
+        {lastExpire ? (
+          <>
+            <td>${lastExpire.amount.toFixed(2)}</td>
+            <td />
+            <td>{timeSinceLastExpire}</td>
+            <td>ago</td>
+          </>
+        ) : (
+          <Unchecked />
+        )}
+      </tr>
+    ),
+    [nextExpire, ntime],
   );
   const nextExpireDisplay = useMemo(
     () => (
       <tr>
         <td>
-          <h3>
-            Next expire
-            <Tooltip>
-              {timeUntilNextExpire
-                ? `Your next order will expire in ${timeUntilNextExpire}`
-                : "The time until your next order will expire"}
-            </Tooltip>
-          </h3>
+          Next expire
+          <Tooltip>
+            {timeUntilNextExpire
+              ? `${nextExpire.contract} will expire in ${timeUntilNextExpire}`
+              : "The time until your next order will expire"}
+          </Tooltip>
         </td>
-        <td>
-          <h3>
-            {nextExpire ? (
-              `$${nextExpire.amount.toFixed(2)} in ${timeUntilNextExpire}`
-            ) : (
-              <Unchecked />
-            )}
-          </h3>
-        </td>
+        {nextExpire ? (
+          <>
+            <td>${nextExpire.amount.toFixed(2)}</td>
+            <td>&nbsp;in&nbsp;</td>
+            <td>{timeUntilNextExpire}</td>
+          </>
+        ) : (
+          <Unchecked />
+        )}
       </tr>
     ),
-    [nextExpire],
+    [nextExpire, ntime],
   );
   const next24HoursDisplay = useMemo(
     () => (
       <tr>
         <td>
-          <h3>
-            Next 24h
-            <Tooltip>Amount earned between now and this time tomorrow</Tooltip>
-          </h3>
+          Next 24h
+          <Tooltip>Amount earned between now and this time tomorrow</Tooltip>
         </td>
-        <td>
-          <h3>
-            {totalNext24h ? `$${totalNext24h.toFixed(2)}` : <Unchecked />}
-          </h3>
-        </td>
+        <td>{totalNext24h ? `$${totalNext24h.toFixed(2)}` : <Unchecked />}</td>
       </tr>
     ),
     [totalNext24h],
   );
   return (
-    <div>
+    <div className={styles.StakeLauncher}>
       <Flashbar items={notifications} />
-      <table>
+      <table style={{ fontSize: "1.5rem", lineHeight: "2rem" }}>
         <tbody>
           {balanceDisplay}
           {dailyDisplay}
           {next24HoursDisplay}
+          {lastExpireDisplay}
           {nextExpireDisplay}
           {settings?.apiKey && (
             <>
@@ -271,13 +313,16 @@ export const StakeLauncher = () => {
                   </div>
                 </td>
                 {notifyThreshold &&
-                  parseFloat(notifyThreshold) !== settings?.notifyThreshold && (
+                  parseFloat(notifyThreshold.replace(/,/g, "")) !==
+                    settings?.notifyThreshold && (
                     <td>
                       <button
                         onClick={() => {
                           const set = {
                             ...settings,
-                            notifyThreshold: parseFloat(notifyThreshold),
+                            notifyThreshold: parseFloat(
+                              notifyThreshold.replace(/,/g, ""),
+                            ),
                           } as Settings;
                           setSettings(set);
                           settingsChanged(set);

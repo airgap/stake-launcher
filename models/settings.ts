@@ -1,44 +1,44 @@
 import { ObjectSchema, FromSchema } from "from-schema";
 export const settings = {
-  title: "Settings",
+  // title: "Settings",
   type: "object",
   properties: {
     farmEmail: {
       type: "string",
       format: "email",
-      title: "Farm email",
+      // title: "Farm email",
     },
     farmPassword: {
       type: "string",
-      title: "Farm password",
+      // title: "Farm password",
     },
     notifyThreshold: {
       type: "number",
-      title: "SMS threshold $",
+      // title: "SMS threshold $",
     },
     apiKey: {
       type: "string",
-      title: "SMS API key",
+      // title: "SMS API key",
     },
     sms: {
       type: "boolean",
-      title: "SMS notifications",
+      // title: "SMS notifications",
     },
     autobuy: {
       type: "boolean",
-      title: "Automatic staking",
+      // title: "Automatic staking",
     },
     autobuyThreshold: {
       type: "number",
-      title: "Auto stake threshold",
+      // title: "Auto stake threshold",
     },
     disableChat: {
       type: "boolean",
-      title: "Disable support chatbox on StakingFarm UI",
+      // title: "Disable support chatbox on StakingFarm UI",
     },
     headless: {
       type: "boolean",
-      title: "Hide the browser when possible",
+      // title: "Hide the browser when possible",
     },
   },
   required: [],
