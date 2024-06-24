@@ -271,8 +271,91 @@ export const StakeLauncher = () => {
     ),
     [totalNext24h],
   );
+  const settingsDisplay = useMemo(
+    () =>
+      settings?.apiKey && (
+        <>
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+                onChange={async (e) => {
+                  const set = {
+                    ...settings,
+                    sms: e.currentTarget.checked,
+                  } as Settings;
+                  setSettings(set);
+                  await settingsChanged(set);
+                }}
+              />
+            </td>
+            <td>Enable SMS</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>SMS threshold</td>
+            <td>
+              <div className="currencyInput">
+                <input
+                  type="number"
+                  min={0}
+                  value={notifyThreshold}
+                  onInput={(e) => setNotifyThreshold(e.currentTarget.value)}
+                />
+              </div>
+            </td>
+            {notifyThreshold &&
+              parseFloat(notifyThreshold.replace(/,/g, "")) !==
+                settings?.notifyThreshold && (
+                <td>
+                  <button
+                    onClick={() => {
+                      const set = {
+                        ...settings,
+                        notifyThreshold: parseFloat(
+                          notifyThreshold.replace(/,/g, ""),
+                        ),
+                      } as Settings;
+                      setSettings(set);
+                      settingsChanged(set);
+                    }}
+                  >
+                    ✔️
+                  </button>
+                  <button
+                    onClick={() =>
+                      setNotifyThreshold(
+                        settings?.notifyThreshold?.toFixed(2) ?? "",
+                      )
+                    }
+                  >
+                    ❌
+                  </button>
+                </td>
+              )}
+          </tr>
+        </>
+      ),
+    [notifyThreshold, settings],
+  );
   return (
     <div className={styles.StakeLauncher}>
+      <div className={styles.nav}>
+        {check}
+        <button className="link" onClick={() => setApiKeyModal(true)}>
+          Set API key
+        </button>
+        <button
+          className="link"
+          onClick={async () => {
+            setQuerying(true);
+            await purgeCookies();
+            setQuerying(false);
+          }}
+        >
+          Purge session
+        </button>
+      </div>
       <Flashbar items={notifications} />
       <table style={{ fontSize: "1.5rem", lineHeight: "2rem" }}>
         <tbody>
@@ -281,88 +364,9 @@ export const StakeLauncher = () => {
           {next24HoursDisplay}
           {lastExpireDisplay}
           {nextExpireDisplay}
-          {settings?.apiKey && (
-            <>
-              <tr>
-                <td>
-                  <input
-                    type="checkbox"
-                    onChange={async (e) => {
-                      const set = {
-                        ...settings,
-                        sms: e.currentTarget.checked,
-                      } as Settings;
-                      setSettings(set);
-                      await settingsChanged(set);
-                    }}
-                  />
-                </td>
-                <td>Enable SMS</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td>SMS threshold</td>
-                <td>
-                  <div className="currencyInput">
-                    <input
-                      type="number"
-                      min={0}
-                      value={notifyThreshold}
-                      onInput={(e) => setNotifyThreshold(e.currentTarget.value)}
-                    />
-                  </div>
-                </td>
-                {notifyThreshold &&
-                  parseFloat(notifyThreshold.replace(/,/g, "")) !==
-                    settings?.notifyThreshold && (
-                    <td>
-                      <button
-                        onClick={() => {
-                          const set = {
-                            ...settings,
-                            notifyThreshold: parseFloat(
-                              notifyThreshold.replace(/,/g, ""),
-                            ),
-                          } as Settings;
-                          setSettings(set);
-                          settingsChanged(set);
-                        }}
-                      >
-                        ✔️
-                      </button>
-                      <button
-                        onClick={() =>
-                          setNotifyThreshold(
-                            settings?.notifyThreshold?.toFixed(2) ?? "",
-                          )
-                        }
-                      >
-                        ❌
-                      </button>
-                    </td>
-                  )}
-              </tr>
-            </>
-          )}
+          {settingsDisplay}
         </tbody>
       </table>
-      {/*<button className="link" onClick={() => setFarmCredModal(true)}>*/}
-      {/*    Preload login*/}
-      {/*</button>*/}
-      <button className="link" onClick={() => setApiKeyModal(true)}>
-        Set API key
-      </button>
-      <button
-        className="link"
-        onClick={async () => {
-          setQuerying(true);
-          await purgeCookies();
-          setQuerying(false);
-        }}
-      >
-        Purge session
-      </button>
-      {check}
       <Bubbles daily={totalDaily} />
       <FarmCredModal
         open={farmCredModal}
